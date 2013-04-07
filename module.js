@@ -41,7 +41,7 @@ M.qtype_canvas.init = function (Y) {
 	var flgPreviewReview = (window.location.search.indexOf("previewid=") != -1 ? true : false);
 	var flgReview = (window.location.pathname.indexOf("/review.php") != -1 ? true : false);
 	// Show right answer?
-	var flgRightAnswer = (arrDivRightAnswer.length != 0 ? true : false);
+	var flgRightAnswer = true;//(arrDivRightAnswer.length != 0 ? true : false);
 	// * * * * *
 	// Declaring functions
 	// * * * * *
@@ -138,9 +138,11 @@ M.qtype_canvas.init = function (Y) {
 	// Do some stuff ;)
 	for (var j in arrDivCanvas){
 		// j = parseInt(j);
-		t = arrDivCanvas[parseInt(j)].getAttribute('id');
-		var container = getById(t);
-		if(container.flgCanvas == undefined){
+        if (typeof arrDivCanvas[parseInt(j)] != 'undefined') {
+		    t = arrDivCanvas[parseInt(j)].getAttribute('id');
+		    var container = getById(t);
+        }
+		if(typeof container.flgCanvas == 'undefined'){
 			// Add canvas only once
 			container.flgCanvas = true;
 			var strID = container.id;
