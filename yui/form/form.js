@@ -28,7 +28,7 @@ YUI.add('moodle-qtype_canvas-form', function(Y) {
             var imgURL = Y.one('#id_qtype_canvas_image_file').ancestor().one('div.filepicker-filelist a').get('href');
             var image = new Image();
             image.src = imgURL;
-            image.onload = function (scope) {
+            image.onload = function () {
                 Y.one(SELECTORS.GENERICCANVAS).setStyles({
                     backgroundImage: "url('" + imgURL + "')",
                     display: 'block'
