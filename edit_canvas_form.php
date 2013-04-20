@@ -84,7 +84,7 @@ class qtype_canvas_edit_form extends question_edit_form {
                            array('maxbytes' => $maxbytes, 'accepted_types' => '*'));
         $mform->closeHeaderBefore('drawsolution');
         /* Voma end edit */
-        $mform->addElement('html', '<canvas id="qtype_canvas_bgimage" style="margin-left: auto; margin-right: auto; margin-top:5px; border: 1px solid black; cursor: crosshair; display: none;">');
+        $mform->addElement('html', '<canvas class="qtype_canvas" style="margin-left: auto; margin-right: auto; margin-top:5px; border: 1px solid black; cursor: crosshair; display: none;">');
         $this->add_per_answer_fields($mform, get_string('answerno', 'qtype_canvas', '{no}'),
                 question_bank::fraction_options());
 

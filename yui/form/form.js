@@ -7,7 +7,8 @@ YUI.add('moodle-qtype_canvas-form', function(Y) {
     var CSS = {
         },
         SELECTORS = {
-            GENERICCANVAS: '.qtype_canvas'
+            GENERICCANVAS: '.qtype_canvas',
+            FILEPICKER: '#id_qtype_canvas_image_file'
         };
     Y.namespace('Moodle.qtype_canvas.form');
     Y.Moodle.qtype_canvas.form = {
@@ -17,24 +18,31 @@ YUI.add('moodle-qtype_canvas-form', function(Y) {
         mouseMoveSub: 0,
 
         init: function() {
-            Y.delegate('change',    this.canvas_change,     Y.config.doc, SELECTORS.GENERICCANVAS, this);
+            Y.delegate('change',    this.filepicker_change,     Y.config.doc, SELECTORS.FILEPICKER, this);
             Y.delegate('mousedown', this.canvas_mousedown,  Y.config.doc, SELECTORS.GENERICCANVAS, this);
             Y.delegate('mouseup',   this.canvas_mouseup,    Y.config.doc, SELECTORS.GENERICCANVAS, this);
+
+            this.canvasContext = Y.one(SELECTORS.GENERICCANVAS).getDOMNode().getContext('2d');
+
+            this.canvasContext.lineWidth = 5;
+            this.canvasContext.lineJoin = 'round';
+            this.canvasContext.lineCap = 'round';
+            this.canvasContext.strokeStyle = 'blue';
         },
-        canvas_change: function(e) {
+        filepicker_change: function(e) {
             // TODO: This needs changing to get the image file?
             // The clicked qtype_canvas can be found at e.currentTarget.
             var imgURL = Y.one('#id_qtype_canvas_image_file').ancestor().one('div.filepicker-filelist a').get('href');
             var image = new Image();
             image.src = imgURL;
-            image.on('load', function(image, imageurl) {
-                this.setStyles({
-                    backgroundImage: "url('" + imageurl + "')",
-                    width: image.getStyle('width'),
-                    height: image.getStyle('height'),
+            image.onload = function () {
+                Y.one(SELECTORS.GENERICCANVAS).setStyles({
+                    backgroundImage: "url('" + imgURL + "')",
+                    /*width: image.width,
+                    height: image.height,*/
                     display: 'block'
                 });
-            });
+            };
         },
         canvas_mousedown: function(e) {
             // Haven't touched this yet...
@@ -43,27 +51,22 @@ YUI.add('moodle-qtype_canvas-form', function(Y) {
             // to write this
 
             this.canvasContext.beginPath();
-            var offset = Y.one('#qtype_canvas_bgimage').getXY();
+            var offset = Y.one(SELECTORS.GENERICCANVAS).getXY();
             this.canvasContext.moveTo(e.pageX - offset[0], e.pageY - offset[1]);
             //this.canvasContext.moveTo(e.layerX, e.layerY);
             this.mouseMoveSub = Y.on('mousemove', function(f) {
-                var offset = Y.one('#qtype_canvas_bgimage').getXY();
+                var offset = Y.one(SELECTORS.GENERICCANVAS).getXY();
                 this.canvasContext.lineTo(f.pageX - offset[0], f.pageY - offset[1]);
                 //this.canvasContext.lineTo(f.layerX, f.layerY);
                 this.canvasContext.stroke();
-            }, '#qtype_canvas_bgimage', this);
+            }, SELECTORS.GENERICCANVAS, this);
         },
         canvas_mouseup: function(e) {
             // The clicked qtype_canvas can be found at e.currentTarget.
+            this.mouseMoveSub.detach();
         },
         old: function() {
             // This needs to move to wherever it's needed ;)
-            this.canvasContext = Y.one('#qtype_canvas_bgimage').getDOMNode().getContext('2d');
-
-            this.canvasContext.lineWidth = 5;
-            this.canvasContext.lineJoin = 'round';
-            this.canvasContext.lineCap = 'round';
-            this.canvasContext.strokeStyle = 'blue';
         }
     };
 }, '@VERSION@', {requires: ['node', 'event'] });
