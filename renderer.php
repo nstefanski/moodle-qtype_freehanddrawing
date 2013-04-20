@@ -49,10 +49,12 @@ class qtype_canvas_renderer extends qtype_renderer {
 		);
 
 		/* Voma Start */
-		// Include module JavaScript
-		$this->page->requires->js_init_call('M.qtype_canvas.init');
+        // Include module JavaScript
+        $this->page->requires->yui_module('moodle-qtype_canvas-form',
+                'Y.Moodle.qtype_canvas.form.init');
+		//$this->page->requires->js_init_call('M.qtype_canvas.init');
 		// http://docs.moodle.org/dev/Using_jQuery_with_Moodle_2.0
-		$this->page->requires->js('/question/type/canvas/jquery-1.7.2.js');
+		//$this->page->requires->js('/question/type/canvas/jquery-1.7.2.js');
 		// require_js(array('yui_yahoo', 'node'));
 		// Prepare some variables
 		$temp1; $temp2; // temporary variables

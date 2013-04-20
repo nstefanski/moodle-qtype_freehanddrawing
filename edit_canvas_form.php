@@ -95,8 +95,7 @@ class qtype_canvas_edit_form extends question_edit_form {
         global $PAGE;
         $params = array('nothing'=>1);
         $PAGE->requires->yui_module('moodle-qtype_canvas-form',
-                'M.qtype_canvas.form.init',
-                array($params));
+                'Y.Moodle.qtype_canvas.form.init');
     }
 
     protected function data_preprocessing($question) {
