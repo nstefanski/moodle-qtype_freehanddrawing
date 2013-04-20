@@ -21,13 +21,6 @@ YUI.add('moodle-qtype_canvas-form', function(Y) {
             Y.delegate('change',    this.filepicker_change,     Y.config.doc, SELECTORS.FILEPICKER, this);
             Y.delegate('mousedown', this.canvas_mousedown,  Y.config.doc, SELECTORS.GENERICCANVAS, this);
             Y.delegate('mouseup',   this.canvas_mouseup,    Y.config.doc, SELECTORS.GENERICCANVAS, this);
-
-            this.canvasContext = Y.one(SELECTORS.GENERICCANVAS).getDOMNode().getContext('2d');
-
-            this.canvasContext.lineWidth = 5;
-            this.canvasContext.lineJoin = 'round';
-            this.canvasContext.lineCap = 'round';
-            this.canvasContext.strokeStyle = 'blue';
         },
         filepicker_change: function(e) {
             // TODO: This needs changing to get the image file?
@@ -35,14 +28,19 @@ YUI.add('moodle-qtype_canvas-form', function(Y) {
             var imgURL = Y.one('#id_qtype_canvas_image_file').ancestor().one('div.filepicker-filelist a').get('href');
             var image = new Image();
             image.src = imgURL;
-            image.onload = function () {
+            image.onload = function (scope) {
                 Y.one(SELECTORS.GENERICCANVAS).setStyles({
                     backgroundImage: "url('" + imgURL + "')",
                     display: 'block'
                 });
                 Y.one(SELECTORS.GENERICCANVAS).getDOMNode().width = image.width;
                 Y.one(SELECTORS.GENERICCANVAS).getDOMNode().height = image.height;
-            };
+                this.canvasContext = Y.one(SELECTORS.GENERICCANVAS).getDOMNode().getContext('2d');
+                this.canvasContext.lineWidth = 5;
+                this.canvasContext.lineJoin = 'round';
+                this.canvasContext.lineCap = 'round';
+                this.canvasContext.strokeStyle = 'blue';
+            }.bind(this);
         },
         canvas_mousedown: function(e) {
             // Haven't touched this yet...
