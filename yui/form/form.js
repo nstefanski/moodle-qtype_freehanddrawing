@@ -38,8 +38,8 @@ YUI.add('moodle-qtype_canvas-form', function(Y) {
             image.onload = function () {
                 Y.one(SELECTORS.GENERICCANVAS).setStyles({
                     backgroundImage: "url('" + imgURL + "')",
-                    /*width: image.width,
-                    height: image.height,*/
+                    width: image.width,
+                    height: image.height,
                     display: 'block'
                 });
             };
@@ -52,11 +52,15 @@ YUI.add('moodle-qtype_canvas-form', function(Y) {
 
             this.canvasContext.beginPath();
             var offset = Y.one(SELECTORS.GENERICCANVAS).getXY();
-            this.canvasContext.moveTo(e.pageX - offset[0], e.pageY - offset[1]);
+            var sx = Y.one(SELECTORS.GENERICCANVAS).getDOMNode().width / Y.one(SELECTORS.GENERICCANVAS).getDOMNode().offsetWidth;
+            var sy = Y.one(SELECTORS.GENERICCANVAS).getDOMNode().height / Y.one(SELECTORS.GENERICCANVAS).getDOMNode().offsetHeight;
+            this.canvasContext.moveTo((e.pageX - offset[0])*sx, (e.pageY - offset[1])*sy);
             //this.canvasContext.moveTo(e.layerX, e.layerY);
             this.mouseMoveSub = Y.on('mousemove', function(f) {
                 var offset = Y.one(SELECTORS.GENERICCANVAS).getXY();
-                this.canvasContext.lineTo(f.pageX - offset[0], f.pageY - offset[1]);
+                var sx = Y.one(SELECTORS.GENERICCANVAS).getDOMNode().width / Y.one(SELECTORS.GENERICCANVAS).getDOMNode().offsetWidth;
+                var sy = Y.one(SELECTORS.GENERICCANVAS).getDOMNode().height / Y.one(SELECTORS.GENERICCANVAS).getDOMNode().offsetHeight;
+                this.canvasContext.lineTo((f.pageX - offset[0])*sx, (f.pageY - offset[1])*sy);
                 //this.canvasContext.lineTo(f.layerX, f.layerY);
                 this.canvasContext.stroke();
             }, SELECTORS.GENERICCANVAS, this);
