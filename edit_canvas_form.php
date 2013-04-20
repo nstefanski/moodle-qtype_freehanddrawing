@@ -36,9 +36,9 @@ class qtype_canvas_edit_form extends question_edit_form {
     protected function definition_inner($mform) {
         /* Voma add start */
         global $PAGE;
-        $PAGE->requires->js_init_call('M.qtype_canvas.init');
+//        $PAGE->requires->js_init_call('M.qtype_canvas.init');
 		// http://docs.moodle.org/dev/Using_jQuery_with_Moodle_2.0
-		$PAGE->requires->js('/question/type/canvas/jquery-1.7.2.js');
+//		$PAGE->requires->js('/question/type/canvas/jquery-1.7.2.js');
         $mform->addElement('select', 'radius',
                 get_string('radius', 'qtype_canvas'), array(
                 0 => 1,
@@ -76,23 +76,34 @@ class qtype_canvas_edit_form extends question_edit_form {
                 get_string('casesensitive', 'qtype_canvas'), $menu);
  		Voma exclude end */
         /* Voma start edit */
-        $mform->addElement('static', 'drawsolution',
+        /*$mform->addElement('static', 'drawsolution',
                 get_string('correctanswers', 'qtype_canvas'),
                 get_string('filloutoneanswer', 'qtype_canvas'));
+        */
+        $mform->addElement('filepicker', 'qtype_canvas_image_file', get_string('file'), null,
+                           array('maxbytes' => $maxbytes, 'accepted_types' => '*'));
         $mform->closeHeaderBefore('drawsolution');
         /* Voma end edit */
-
+        $mform->addElement('html', '<canvas id="qtype_canvas_bgimage" style="margin-left: auto; margin-right: auto; margin-top:5px; border: 1px solid black; cursor: crosshair; display: none;">');
         $this->add_per_answer_fields($mform, get_string('answerno', 'qtype_canvas', '{no}'),
                 question_bank::fraction_options());
 
         $this->add_interactive_settings();
+
+    }
+    public function js_call() {
+        global $PAGE;
+        $params = array('nothing'=>1);
+        $PAGE->requires->yui_module('moodle-qtype_canvas-form',
+                'M.qtype_canvas.form.init',
+                array($params));
     }
 
     protected function data_preprocessing($question) {
         $question = parent::data_preprocessing($question);
         $question = $this->data_preprocessing_answers($question);
         $question = $this->data_preprocessing_hints($question);
-
+        $this->js_call();
         return $question;
     }
 
