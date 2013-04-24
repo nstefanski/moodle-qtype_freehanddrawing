@@ -39,7 +39,7 @@ require_once($CFG->dirroot . '/question/type/canvas/question.php');
  */
 class qtype_canvas extends question_type {
     public function extra_question_fields() {
-        return array('question_canvas', 'answers', 'usecase');
+        return array('question_canvas', 'answers', 'usecase', 'radius');
     }
 
     public function questionid_column_name() {
@@ -115,11 +115,19 @@ class qtype_canvas extends question_type {
 
         $this->save_hints($question);
 
-        // Perform sanity checks on fractional grades
-        if ($maxfraction != 1) {
-            $result->noticeyesno = get_string('fractionsnomax', 'question', $maxfraction * 100);
-            return $result;
-        }
+        $answer = new stdClass();
+        $answer->question = $question->id;
+        $answer->answer = $question->qtype_canvas_textarea;
+        $answer->feedback = '';
+        $answer->id = $DB->insert_record('question_answers', $answer);
+
+        file_save_draft_area_files($question->qtype_canvas_image_file, $question->context->id,
+                'qtype_canvas', 'qtype_canvas_image_file', $question->id,
+                array('subdirs' => 0, 'maxbytes' => 0, 'maxfiles' => 1));
+
+
+
+
     }
 
     protected function initialise_question_instance(question_definition $question, $questiondata) {

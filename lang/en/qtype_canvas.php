@@ -49,3 +49,5 @@ $string['caseyes'] = 'Yes, case must match';
 $string['correctansweris'] = 'The correct answer is: {$a}.';
 $string['notenoughanswers'] = 'This type of question requires at least {$a} answers';
 $string['pleaseenterananswer'] = 'Please enter an answer.';
+$string['drawing_parameters'] = 'Drawing Parameters';
+$string['introtext'] = 'Your Drawing Raw Data';

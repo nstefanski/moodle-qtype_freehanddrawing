@@ -39,6 +39,7 @@ class qtype_canvas_edit_form extends question_edit_form {
 //        $PAGE->requires->js_init_call('M.qtype_canvas.init');
 		// http://docs.moodle.org/dev/Using_jQuery_with_Moodle_2.0
 //		$PAGE->requires->js('/question/type/canvas/jquery-1.7.2.js');
+        $mform->addElement('header', 'qtype_canvas_drawing_parameters', get_string('drawing_parameters', 'qtype_canvas'));
         $mform->addElement('select', 'radius',
                 get_string('radius', 'qtype_canvas'), array(
                 0 => 1,
@@ -80,15 +81,17 @@ class qtype_canvas_edit_form extends question_edit_form {
                 get_string('correctanswers', 'qtype_canvas'),
                 get_string('filloutoneanswer', 'qtype_canvas'));
         */
+        
+        $mform->addElement('textarea', 'qtype_canvas_textarea', get_string("introtext", "qtype_canvas"), 'wrap="virtual" rows="20" cols="50"');
         $mform->addElement('filepicker', 'qtype_canvas_image_file', get_string('file'), null,
                            array('maxbytes' => $maxbytes, 'accepted_types' => '*'));
         $mform->closeHeaderBefore('drawsolution');
         /* Voma end edit */
         $mform->addElement('html', '<canvas class="qtype_canvas" style="margin-left: auto; margin-right: auto; margin-top:5px; border: 1px solid black; cursor: crosshair; display: none;">');
-        $this->add_per_answer_fields($mform, get_string('answerno', 'qtype_canvas', '{no}'),
-                question_bank::fraction_options());
+        //$this->add_per_answer_fields($mform, get_string('answerno', 'qtype_canvas', '{no}'), question_bank::fraction_options());
 
         $this->add_interactive_settings();
+
 
     }
     public function js_call() {
@@ -107,6 +110,7 @@ class qtype_canvas_edit_form extends question_edit_form {
     }
 
     public function validation($data, $files) {
+        return "";
         $errors = parent::validation($data, $files);
         $answers = $data['answer'];
         $answercount = 0;
