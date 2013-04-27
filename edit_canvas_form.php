@@ -53,8 +53,8 @@ class qtype_canvas_edit_form extends question_edit_form {
                 8 => 17,
                 9 => 19));
 
-       $mform->addElement('select', 'usecase',
-                get_string('casesensitive', 'qtype_canvas'), array(
+       $mform->addElement('select', 'threshold',
+                get_string('threshold', 'qtype_canvas'), array(
                 0 => 50,
                 1 => 55,
                 2 => 60,

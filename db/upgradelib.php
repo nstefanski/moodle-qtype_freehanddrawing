@@ -36,6 +36,34 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright  2010 The Open University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+/*
+if ($oldversion < XXXXXXXXXX) {
+
+    // Define table qtype_canvas to be created
+    $table = new xmldb_table('qtype_canvas');
+
+    // Adding fields to table qtype_canvas
+    $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+    $table->add_field('questionid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+    $table->add_field('threshold', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+    $table->add_field('radius', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+
+    // Adding keys to table qtype_canvas
+    $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+    $table->add_key('questionid', XMLDB_KEY_FOREIGN, array('questionid'), 'question', array('id'));
+
+    // Conditionally launch create table for qtype_canvas
+    if (!$dbman->table_exists($table)) {
+        $dbman->create_table($table);
+    }
+
+    // canvas savepoint reached
+    upgrade_plugin_savepoint(true, XXXXXXXXXX, 'qtype', 'canvas');
+}
+*/
+
+
 class qtype_canvas_qe2_attempt_updater extends question_qtype_attempt_updater {
     public function right_answer() {
         foreach ($this->question->options->answers as $ans) {

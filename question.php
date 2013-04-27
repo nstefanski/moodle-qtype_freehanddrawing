@@ -36,7 +36,9 @@ defined('MOODLE_INTERNAL') || die();
 class qtype_canvas_question extends question_graded_by_strategy
         implements question_response_answer_comparer {
     /** @var boolean whether answers should be graded case-sensitively. */
-    public $usecase;
+    public $threshold;
+    public $radius;
+
     /** @var array of question_answer. */
     public $answers = array();
 

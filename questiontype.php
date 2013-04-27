@@ -39,11 +39,11 @@ require_once($CFG->dirroot . '/question/type/canvas/question.php');
  */
 class qtype_canvas extends question_type {
     public function extra_question_fields() {
-        return array('question_canvas', 'answers', 'usecase', 'radius');
+        return array('qtype_canvas', 'threshold', 'radius');
     }
 
     public function questionid_column_name() {
-        return 'question';
+        return 'questionid';
     }
 
     public function move_files($questionid, $oldcontextid, $newcontextid) {

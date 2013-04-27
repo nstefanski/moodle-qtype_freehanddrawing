@@ -38,14 +38,12 @@ $string['correctanswers'] = 'Upload image (GIF, JPG, PNG) and draw correct answe
 // Voma start: Don't change this!!!
 $string['filloutoneanswer'] = '<iframe id="upload_area" name="upload_area" src="type/canvas/pix/index.php" class="upload_area"></iframe><div id="qe:f_" class="qtype_canvas"></div>';
 // Voma end: Don't change this!!!
-$string['casesensitive'] = 'Threshold for correct answers (%)';
+$string['threshold'] = 'Threshold for correct answers (%)';
 /* Voma edit end */
 $string['addmoreanswerblanks'] = 'Blanks for {no} More Answers';
 $string['answer'] = 'Answer: {$a}';
 $string['answermustbegiven'] = 'You must enter an answer if there is a grade or feedback.';
 $string['answerno'] = 'Answer {$a}';
-$string['caseno'] = 'No, case is unimportant';
-$string['caseyes'] = 'Yes, case must match';
 $string['correctansweris'] = 'The correct answer is: {$a}.';
 $string['notenoughanswers'] = 'This type of question requires at least {$a} answers';
 $string['pleaseenterananswer'] = 'Please enter an answer.';
