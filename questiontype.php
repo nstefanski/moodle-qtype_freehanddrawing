@@ -117,7 +117,7 @@ class qtype_canvas extends question_type {
 
         $answer = new stdClass();
         $answer->question = $question->id;
-        $answer->answer = $question->qtype_canvas_textarea;
+        $answer->answer = $question->qtype_canvas_textarea_id_0;
         $answer->feedback = '';
         $answer->id = $DB->insert_record('question_answers', $answer);
 

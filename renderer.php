@@ -33,8 +33,10 @@ defined('MOODLE_INTERNAL') || die();
  * @license	http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_canvas_renderer extends qtype_renderer {
-	public function formulation_and_controls(question_attempt $qa,
-			question_display_options $options) {
+
+
+
+    public function formulation_and_controls(question_attempt $qa, question_display_options $options) {
 
 		$question = $qa->get_question();
 		$currentanswer = $qa->get_last_qt_var('answer');
@@ -51,11 +53,7 @@ class qtype_canvas_renderer extends qtype_renderer {
 		/* Voma Start */
         // Include module JavaScript
         $this->page->requires->yui_module('moodle-qtype_canvas-form',
-                'Y.Moodle.qtype_canvas.form.init');
-		//$this->page->requires->js_init_call('M.qtype_canvas.init');
-		// http://docs.moodle.org/dev/Using_jQuery_with_Moodle_2.0
-		//$this->page->requires->js('/question/type/canvas/jquery-1.7.2.js');
-		// require_js(array('yui_yahoo', 'node'));
+                'Y.Moodle.qtype_canvas.form.init', array($question->id, $question->radius));
 		// Prepare some variables
 		$temp1; $temp2; // temporary variables
 		$strID = str_replace ("answer", "", $inputattributes['id']);
@@ -88,14 +86,19 @@ class qtype_canvas_renderer extends qtype_renderer {
 			$inputattributes['size'] = round(strlen($placeholder) * 1.1);
 		}
 
-		$input = html_writer::empty_tag('input', $inputattributes) . $feedbackimg;
+        $bgimageArray = self::get_url_for_image($qa, 'qtype_canvas_image_file');
+        
+        $canvas = "<div class=\"qtype_canvas_id_" . $question->id . "\"><textarea class=\"qtype_canvas_textarea\" name=\"qtype_canvas_textarea_id_".$question->id."\" rows=20 cols=50></textarea><canvas class=\"qtype_canvas\" width=\"".$bgimageArray[1]."\" height=\"".$bgimageArray[2]."\"style=\"background:url('$bgimageArray[0]')\"></canvas></div>";
+		//$input = html_writer::empty_tag('input', $inputattributes) . $feedbackimg;
+        
+        
 
 		if ($placeholder) {
 			$questiontext = substr_replace($questiontext, $input,
 					strpos($questiontext, $placeholder), strlen($placeholder));
 		}
 
-		$result = html_writer::tag('div', $questiontext, array('class' => 'qtext'));
+		$result = html_writer::tag('div', $questiontext . $canvas, array('class' => 'qtext'));
 
 		if (!$placeholder) {
 			$result .= html_writer::start_tag('div', array('class' => 'ablock'));
@@ -150,4 +153,42 @@ class qtype_canvas_renderer extends qtype_renderer {
 
 		return get_string('correctansweris', 'qtype_canvas', s($answer->answer));
 	}
+
+
+
+
+    protected static function get_url_for_image(question_attempt $qa, $filearea, $itemid = 0) {
+        $question = $qa->get_question();
+        $qubaid = $qa->get_usage_id();
+        $slot = $qa->get_slot();
+        $fs = get_file_storage();
+        $componentname = $question->qtype->plugin_name();
+        $draftfiles = $fs->get_area_files($question->contextid, $componentname,
+                $filearea, $question->id, 'id');
+        if ($draftfiles) {
+            foreach ($draftfiles as $file) {
+                if ($file->is_directory()) {
+                    continue;
+                }
+                $url = moodle_url::make_pluginfile_url($question->contextid, $componentname,
+                        $filearea, "$qubaid/$slot/$question->id", '/',
+                        $file->get_filename());
+                //$image = new Imagick();
+                //$image->readImageBlob($file->get_content);
+                //$d = $image->getImageGeometry();
+                $image = imagecreatefromstring($file->get_content());
+                $width = imagesx($image);
+                $height = imagesy($image);
+                return array($url->out(), $width, $height);
+            }
+        }
+        return null;
+    }
+
+
+
+
+
+
+
 }

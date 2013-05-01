@@ -157,15 +157,10 @@ class qtype_canvas_question extends question_graded_by_strategy
 
     public function check_file_access($qa, $options, $component, $filearea,
             $args, $forcedownload) {
-        if ($component == 'question' && $filearea == 'answerfeedback') {
-            $currentanswer = $qa->get_last_qt_var('answer');
-            $answer = $qa->get_question()->get_matching_answer(array('answer' => $currentanswer));
-            $answerid = reset($args); // itemid is answer id.
-            return $options->feedback && $answerid == $answer->id;
-
-        } else if ($component == 'question' && $filearea == 'hint') {
-            return $this->check_hint_file_access($qa, $options, $args);
-
+        if ($component == 'qtype_canvas' && $filearea == 'qtype_canvas_image_file') {
+            $question = $qa->get_question();                                                                                                                                
+            $itemid = reset($args);                                                                                                                                         
+            return ($itemid == $question->id);                                                                                                                            
         } else {
             return parent::check_file_access($qa, $options, $component, $filearea,
                     $args, $forcedownload);

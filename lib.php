@@ -19,7 +19,7 @@
  *
  * @since      2.0
  * @package    qtype
- * @subpackage canvas
+ * @subpackage ddimageortext
  * @copyright  Dongsheng Cai <dongsheng@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -29,10 +29,11 @@ defined('MOODLE_INTERNAL') || die();
 
 
 /**
- * Checks file access for short answer questions.
+ * Checks file access for ddimageortext questions.
  */
-function qtype_canvas_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload) {
-    global $DB, $CFG;
+function qtype_canvas_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options=array()) {
+    global $CFG;
     require_once($CFG->libdir . '/questionlib.php');
-    question_pluginfile($course, $context, 'qtype_canvas', $filearea, $args, $forcedownload);
+    question_pluginfile($course, $context, 'qtype_canvas',
+                                                                $filearea, $args, $forcedownload, $options);
 }
