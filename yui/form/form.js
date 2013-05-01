@@ -58,7 +58,7 @@ YUI.add('moodle-qtype_canvas-form', function(Y) {
 		if (questionID == 0) {
 			this.drawingRadius[0] = Y.one(SELECTORS.DRAWINGRADIUS).get('selectedIndex')*2+1;
 		}
-		return this.drawingRadius[questionID];
+		return this.drawingRadius[questionID]*2+1;
 	},
 	
 	
