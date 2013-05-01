@@ -104,11 +104,20 @@ YUI.add('moodle-qtype_canvas-form', function(Y) {
 				}
 			}.bind(this));
 		}
+		textarea = this.canvas_get_textarea(canvasNode);
+		console.log(textarea.get('value'));
 		this.canvasContext[questionID] = canvasNode.getDOMNode().getContext('2d');
 		this.canvasContext[questionID].lineWidth = this.get_drawing_radius(questionID);
 		this.canvasContext[questionID].lineJoin = 'round';
 		this.canvasContext[questionID].lineCap = 'round';
 		this.canvasContext[questionID].strokeStyle = 'blue';
+		if (textarea.get('value') != '') {
+			var img = new Image();
+			img.onload = function() {
+				this.canvasContext[questionID].drawImage(img, 0, 0);
+			}.bind(this);
+			img.src = textarea.get('value');
+		}
 
 	},
 	drawing_radius_change: function(e) {
@@ -138,13 +147,15 @@ YUI.add('moodle-qtype_canvas-form', function(Y) {
 	},
 	canvas_mouseup: function(e) {
 		e.currentTarget.detach('mousemove', this.canvas_mousemove);
-		questionID = this.canvas_get_question_id(e.currentTarget);
+		this.canvas_get_textarea(e.currentTarget).set('value', e.currentTarget.getDOMNode().toDataURL());
+	},
+	canvas_get_textarea: function(node) {
+		questionID = this.canvas_get_question_id(node);
 		if (questionID == 0) {
-			Y.one('textarea[name="qtype_canvas_textarea_id_0"]').set('value', e.currentTarget.getDOMNode().toDataURL());
+			return Y.one('textarea[name="qtype_canvas_textarea_id_0"]');
 		} else {
-			Y.one('textarea[id="qtype_canvas_textarea_id_'+questionID+'"]').set('value', e.currentTarget.getDOMNode().toDataURL());
+			return Y.one('textarea[id="qtype_canvas_textarea_id_'+questionID+'"]');
 		}
-		
 	},
 	canvas_get_question_id: function(node) {
 		if (node.ancestor().getAttribute('class').indexOf('qtype_canvas_id') == -1) {
