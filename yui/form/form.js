@@ -139,7 +139,12 @@ YUI.add('moodle-qtype_canvas-form', function(Y) {
 	canvas_mouseup: function(e) {
 		e.currentTarget.detach('mousemove', this.canvas_mousemove);
 		questionID = this.canvas_get_question_id(e.currentTarget);
-		Y.one('textarea[name="qtype_canvas_textarea_id_'+questionID+'"]').set('value', e.currentTarget.getDOMNode().toDataURL());
+		if (questionID == 0) {
+			Y.one('textarea[name="qtype_canvas_textarea_id_0"]').set('value', e.currentTarget.getDOMNode().toDataURL());
+		} else {
+			Y.one('textarea[id="qtype_canvas_textarea_id_'+questionID+'"]').set('value', e.currentTarget.getDOMNode().toDataURL());
+		}
+		
 	},
 	canvas_get_question_id: function(node) {
 		if (node.ancestor().getAttribute('class').indexOf('qtype_canvas_id') == -1) {

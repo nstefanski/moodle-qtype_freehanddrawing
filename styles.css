@@ -1,8 +1,8 @@
 #fitem_id_qtype_canvas_textarea {
-    display: none;
+    display: block;
 }
 .qtype_canvas_textarea {
-	display: none;
+	display: block;
 }
 .qtype_canvas {
     margin-left: auto; 

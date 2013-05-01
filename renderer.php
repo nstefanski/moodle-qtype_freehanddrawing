@@ -88,7 +88,7 @@ class qtype_canvas_renderer extends qtype_renderer {
 
         $bgimageArray = self::get_url_for_image($qa, 'qtype_canvas_image_file');
         
-        $canvas = "<div class=\"qtype_canvas_id_" . $question->id . "\"><textarea class=\"qtype_canvas_textarea\" name=\"qtype_canvas_textarea_id_".$question->id."\" rows=20 cols=50></textarea><canvas class=\"qtype_canvas\" width=\"".$bgimageArray[1]."\" height=\"".$bgimageArray[2]."\"style=\"background:url('$bgimageArray[0]')\"></canvas></div>";
+        $canvas = "<div class=\"qtype_canvas_id_" . $question->id . "\"><textarea class=\"qtype_canvas_textarea\" name=\"$inputname\" id=\"qtype_canvas_textarea_id_".$question->id."\" rows=20 cols=50></textarea><canvas class=\"qtype_canvas\" width=\"".$bgimageArray[1]."\" height=\"".$bgimageArray[2]."\"style=\"background:url('$bgimageArray[0]')\"></canvas></div>";
 		//$input = html_writer::empty_tag('input', $inputattributes) . $feedbackimg;
         
         
