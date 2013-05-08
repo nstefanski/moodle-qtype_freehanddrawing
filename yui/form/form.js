@@ -25,25 +25,47 @@ YUI.add('moodle-qtype_canvas-form', function(Y) {
 			
 			
 			
-			init: function(questionID, drawingRadius) {
-
-
-				if (typeof questionID != undefined) {
+			init: function(questionID, drawingRadius, correctAnswer) {
+				if (typeof correctAnswer != 'undefined') {
 					this.drawingRadius[questionID] = drawingRadius;
-					this.emptyCanvasDataURL[questionID] = Y.one(SELECTORS.GENERICCANVAS).getDOMNode().toDataURL();
-					this.create_canvas_context(questionID);
-				}
-				Y.delegate('change',    this.filepicker_change,     Y.config.doc, SELECTORS.FILEPICKER, this);
-				Y.delegate('click', this.choose_new_image_file_click, Y.config.doc, SELECTORS.CHOOSEFILEBUTTON, this);
-				Y.delegate('mousedown', this.canvas_mousedown,  Y.config.doc, SELECTORS.GENERICCANVAS, this);
-				Y.delegate('mouseup',   this.canvas_mouseup,    Y.config.doc, SELECTORS.GENERICCANVAS, this);
-				Y.delegate('change', this.drawing_radius_change, Y.config.doc, SELECTORS.DRAWINGRADIUS, this);
+					this.draw_correct_answer(questionID, correctAnswer);
+				} else {
 
+					if (typeof questionID != 'undefined') {
+						this.drawingRadius[questionID] = drawingRadius;
+						this.emptyCanvasDataURL[questionID] = Y.one(SELECTORS.GENERICCANVAS).getDOMNode().toDataURL();
+						this.create_canvas_context(questionID);
+					}
+					Y.delegate('change',    this.filepicker_change,     Y.config.doc, SELECTORS.FILEPICKER, this);
+					Y.delegate('click', this.choose_new_image_file_click, Y.config.doc, SELECTORS.CHOOSEFILEBUTTON, this);
+					Y.delegate('mousedown', this.canvas_mousedown,  Y.config.doc, SELECTORS.GENERICCANVAS, this);
+					Y.delegate('mouseup',   this.canvas_mouseup,    Y.config.doc, SELECTORS.GENERICCANVAS, this);
+					Y.delegate('change', this.drawing_radius_change, Y.config.doc, SELECTORS.DRAWINGRADIUS, this);
+				}
 	
 	},
 	
 	
+	draw_correct_answer: function(questionID, correctAnswer) {
+		Y.all(SELECTORS.GENERICCANVAS).each(function(node) {
+			if (node.ancestor().getAttribute('class') == 'qtype_canvas_id_' + questionID) {
+				canvasNode = node;
+			}
+		}.bind(this));
+		
+		canvasNode.setStyles({ cursor: 'auto', });
+		
 	
+		this.canvasContext[questionID] = canvasNode.getDOMNode().getContext('2d');
+		
+			var img = new Image();
+			img.onload = function() {
+				this.canvasContext[questionID].drawImage(img, 0, 0);
+			}.bind(this);
+			img.src = correctAnswer;
+		
+		
+	},
 	choose_new_image_file_click: function(e) {
 		if (this.is_canvas_empty(0) == false) {
 			if (confirm('You have drawn something onto the canvas. Choosing a new image file will erase this. Are you sure you want to go on?') == false) {
@@ -105,7 +127,6 @@ YUI.add('moodle-qtype_canvas-form', function(Y) {
 			}.bind(this));
 		}
 		textarea = this.canvas_get_textarea(canvasNode);
-		console.log(textarea.get('value'));
 		this.canvasContext[questionID] = canvasNode.getDOMNode().getContext('2d');
 		this.canvasContext[questionID].lineWidth = this.get_drawing_radius(questionID);
 		this.canvasContext[questionID].lineJoin = 'round';
@@ -118,7 +139,6 @@ YUI.add('moodle-qtype_canvas-form', function(Y) {
 			}.bind(this);
 			img.src = textarea.get('value');
 		}
-
 	},
 	drawing_radius_change: function(e) {
 		if (this.is_canvas_empty(0) == false) {

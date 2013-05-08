@@ -34,34 +34,119 @@ defined('MOODLE_INTERNAL') || die();
  */
 class qtype_canvas_renderer extends qtype_renderer {
 
-
+	protected  function strstr_after($haystack, $needle, $case_insensitive = false) {
+		$strpos = ($case_insensitive) ? 'stripos' : 'strpos';
+		$pos = $strpos($haystack, $needle);
+		if (is_int($pos)) {
+			return substr($haystack, $pos + strlen($needle));
+		}
+		// Most likely false or null
+		return $pos;
+	}
 
     public function formulation_and_controls(question_attempt $qa, question_display_options $options) {
 
 		$question = $qa->get_question();
-		$currentanswer = $qa->get_last_qt_var('answer');
+		
+		$currentAnswer = $qa->get_last_qt_var('answer');
 
 		$inputname = $qa->get_qt_field_name('answer');
 		$inputattributes = array(
 			'type' => 'text',
 			'name' => $inputname,
-			'value' => $currentanswer,
+			'value' => $currentAnswer,
 			'id' => $inputname,
 			'size' => 80,
 		);
 
 		/* Voma Start */
-        // Include module JavaScript
-        $this->page->requires->yui_module('moodle-qtype_canvas-form',
-                'Y.Moodle.qtype_canvas.form.init', array($question->id, $question->radius));
-		// Prepare some variables
-		$temp1; $temp2; // temporary variables
-		$strID = str_replace ("answer", "", $inputattributes['id']);
-		$temp1 = $question->answers;
-		$temp2 = reset($temp1); $strSolution = $temp2->answer;
-		$temp2 = next($temp1); $strURL = $temp2->answer;
-		$temp2 = next($temp1); $intRadius = $temp2->answer;
-		/* Voma End */
+  
+		
+		if ($options->correctness) {
+			// Beginning of dataURL string: "data:image/png;base64,"
+			
+			$correctAnswer = reset($question->answers)->answer;
+			$correctAnswerData = base64_decode(self::strstr_after($correctAnswer, 'base64,'));
+			$currentAnswerData = base64_decode(self::strstr_after($currentAnswer , 'base64,'));
+			
+			$correctAnswerImg =  imagecreatefromstring($correctAnswerData);
+			$currentAnswerImg =  imagecreatefromstring($currentAnswerData);
+			
+			
+			$blendedImg = imagecreatefromstring($currentAnswerData);
+			
+			imagealphablending( $correctAnswerImg, false );
+			imagesavealpha( $correctAnswerImg, true );
+			
+			imagealphablending( $currentAnswerImg, false );
+			imagesavealpha( $currentAnswerImg, true );
+			
+			imagealphablending( $blendedImg, false );
+			imagesavealpha( $blendedImg, true );
+			
+			$width = imagesx($blendedImg);
+			$height = imagesy($blendedImg);
+			$green = imagecolorallocate($blendedImg, 0, 255, 0);
+			$blue = imagecolorallocate($blendedImg, 0, 0, 255);
+			$red = imagecolorallocate($blendedImg, 255, 0, 0);
+			
+			$matchingPixels = 0;
+			$totalPixels = 0;
+			for ($x = 0; $x < $width; $x++) {
+				for ($y = 0; $y < $height; $y++) {
+					$rgbCorrectAns = imagecolorat($correctAnswerImg, $x, $y);
+					$rgbCurrentAns = imagecolorat($currentAnswerImg, $x, $y);
+					$rgbCorrectAnsArray = array(($rgbCorrectAns >> 16) & 0xFF, ($rgbCorrectAns >> 8) & 0xFF, $rgbCorrectAns & 0xFF);
+					$rgbCurrentAnsArray = array(($rgbCurrentAns >> 16) & 0xFF, ($rgbCurrentAns >> 8) & 0xFF, $rgbCurrentAns & 0xFF);
+					if ($rgbCorrectAnsArray[2] == 255 && $rgbCurrentAnsArray[2] == 255) {
+						$matchingPixels++;
+						$totalPixels++;
+						imagesetpixel($blendedImg, $x, $y, $green);
+					} else if ($rgbCorrectAnsArray[2] == 255 && $rgbCurrentAnsArray[2] == 0) {
+						imagesetpixel($blendedImg, $x, $y, $blue);
+						$totalPixels++;
+					} else if ($rgbCorrectAnsArray[2] == 0 && $rgbCurrentAnsArray[2] == 255) {
+						imagesetpixel($blendedImg, $x, $y, $red);
+						$matchingPixels--;
+					}
+						
+				}
+			}
+			
+			$matchPercentage = ($matchingPixels / $totalPixels)*100;
+			ob_start();
+			imagepng($blendedImg);
+			$blendedImgData = ob_get_contents();
+			ob_end_clean();
+			$blendedImgDataURL = 'data:image/png;base64,' . base64_encode($blendedImgData);
+			
+			imagedestroy($correctAnswerImg);
+			imagedestroy($currentAnswerImg);
+			imagedestroy($blendedImg);
+			
+			$this->page->requires->yui_module('moodle-qtype_canvas-form',
+					'Y.Moodle.qtype_canvas.form.init', array($question->id, $question->radius, $blendedImgDataURL));
+			
+		} else {
+
+			$this->page->requires->yui_module('moodle-qtype_canvas-form',
+					'Y.Moodle.qtype_canvas.form.init', array($question->id, $question->radius));
+		}
+// 		// Prepare some variables
+// 		$temp1; 
+// 		$temp2; // temporary variables
+		
+// 		$strID = str_replace ("answer", "", $inputattributes['id']);
+		
+// 		$temp1 = $question->answers;
+// 		$temp2 = reset($temp1); 
+		
+// 		$strSolution = $temp2->answer;
+// 		$temp2 = next($temp1); 
+// 		$strURL = $temp2->answer;
+// 		$temp2 = next($temp1); 
+// 		$intRadius = $temp2->answer;
+// 		/* Voma End */
 
 		if ($options->readonly) {
 			$inputattributes['readonly'] = 'readonly';
@@ -69,12 +154,7 @@ class qtype_canvas_renderer extends qtype_renderer {
 
 		$feedbackimg = '';
 		if ($options->correctness) {
-			$answer = $question->get_matching_answer(array('answer' => $currentanswer));
-			if ($answer) {
-				$fraction = $answer->fraction;
-			} else {
-				$fraction = 0;
-			}
+			$fraction = ($matchPercentage /  ($question->threshold*5+50));
 			$inputattributes['class'] = $this->feedback_class($fraction);
 			$feedbackimg = $this->feedback_image($fraction);
 		}
@@ -88,44 +168,51 @@ class qtype_canvas_renderer extends qtype_renderer {
 
         $bgimageArray = self::get_url_for_image($qa, 'qtype_canvas_image_file');
         
-        $canvas = "<div class=\"qtype_canvas_id_" . $question->id . "\"><textarea class=\"qtype_canvas_textarea\" name=\"$inputname\" id=\"qtype_canvas_textarea_id_".$question->id."\" rows=20 cols=50>$currentanswer</textarea><canvas class=\"qtype_canvas\" width=\"".$bgimageArray[1]."\" height=\"".$bgimageArray[2]."\"style=\"background:url('$bgimageArray[0]')\"></canvas></div>";
+        $canvas = "<div class=\"qtype_canvas_id_" . $question->id . "\">";
+        if ($options->correctness) {
+        	$canvas .= "<h1>".sprintf('%0.2f', $matchPercentage)."% out of necessary ".sprintf('%0.2f', $question->threshold*5+50)."%.</h1><hr>" . $feedbackimg . "<hr>";
+        } else {
+        	$canvas .= "<textarea class=\"qtype_canvas_textarea\" name=\"$inputname\" id=\"qtype_canvas_textarea_id_".$question->id."\" rows=20 cols=50>$currentAnswer</textarea>";
+        }
+        $canvas .= "<canvas class=\"qtype_canvas\" width=\"".$bgimageArray[1]."\" height=\"".$bgimageArray[2]."\"style=\"background:url('$bgimageArray[0]')\"></canvas></div>";
+        
 		//$input = html_writer::empty_tag('input', $inputattributes) . $feedbackimg;
         
         
 
-		if ($placeholder) {
-			$questiontext = substr_replace($questiontext, $input,
-					strpos($questiontext, $placeholder), strlen($placeholder));
-		}
+// 		if ($placeholder) {
+// 			$questiontext = substr_replace($questiontext, $input,
+// 					strpos($questiontext, $placeholder), strlen($placeholder));
+// 		}
 
 		$result = html_writer::tag('div', $questiontext . $canvas, array('class' => 'qtext'));
 
-		if (!$placeholder) {
-			$result .= html_writer::start_tag('div', array('class' => 'ablock'));
-			$result .= get_string('answer', 'qtype_canvas',
-					html_writer::tag('div', $input, array('class' => 'answer')));
-			/* Voma Start */
-			// Write hidden field Solution
-			// if(strpos($_SERVER["PHP_SELF"], "review.php")){
-				$temp1 = array('id' => $strID.'solution', 'name' => $strID.'solution', 'type' => 'hidden', 'value' => $strSolution);
-				$result .= html_writer::empty_tag('input', $temp1);
-			// }
-			// Write hidden field URL
-			$temp1 = array('id' => $strID.'url', 'name' => $strID.'url', 'type' => 'hidden', 'value' => $strURL);
-			$result .= html_writer::empty_tag('input', $temp1);
-			// Write hidden field Radius
-			$temp1 = array('id' => $strID.'radius', 'name' => $strID.'radius', 'type' => 'hidden', 'value' => $intRadius);
-			$result .= html_writer::empty_tag('input', $temp1);
-			// Write DIV for canvas
-			$result .= html_writer::start_tag('div', array('class' => 'qtype_canvas', 'id' => $strID));
-			$result .= html_writer::end_tag('div');
-			/* Voma End */
-			$result .= html_writer::end_tag('div');
-		}
+// 		if (!$placeholder) {
+// 			$result .= html_writer::start_tag('div', array('class' => 'ablock'));
+// 			$result .= get_string('answer', 'qtype_canvas',
+// 					html_writer::tag('div', $input, array('class' => 'answer')));
+// 			/* Voma Start */
+// 			// Write hidden field Solution
+// 			// if(strpos($_SERVER["PHP_SELF"], "review.php")){
+// 				$temp1 = array('id' => $strID.'solution', 'name' => $strID.'solution', 'type' => 'hidden', 'value' => $strSolution);
+// 				$result .= html_writer::empty_tag('input', $temp1);
+// 			// }
+// 			// Write hidden field URL
+// 			$temp1 = array('id' => $strID.'url', 'name' => $strID.'url', 'type' => 'hidden', 'value' => $strURL);
+// 			$result .= html_writer::empty_tag('input', $temp1);
+// 			// Write hidden field Radius
+// 			$temp1 = array('id' => $strID.'radius', 'name' => $strID.'radius', 'type' => 'hidden', 'value' => $intRadius);
+// 			$result .= html_writer::empty_tag('input', $temp1);
+// 			// Write DIV for canvas
+// 			$result .= html_writer::start_tag('div', array('class' => 'qtype_canvas', 'id' => $strID));
+// 			$result .= html_writer::end_tag('div');
+// 			/* Voma End */
+// 			$result .= html_writer::end_tag('div');
+// 		}
 
 		if ($qa->get_state() == question_state::$invalid) {
 			$result .= html_writer::nonempty_tag('div',
-					$question->get_validation_error(array('answer' => $currentanswer)),
+					$question->get_validation_error(array('answer' => $currentAnswer)),
 					array('class' => 'validationerror'));
 		}
 		return $result;
