@@ -34,7 +34,7 @@ defined('MOODLE_INTERNAL') || die();
  */
 class qtype_canvas_renderer extends qtype_renderer {
 
-	protected  function strstr_after($haystack, $needle, $case_insensitive = false) {
+	public static  function strstr_after($haystack, $needle, $case_insensitive = false) {
 		$strpos = ($case_insensitive) ? 'stripos' : 'strpos';
 		$pos = $strpos($haystack, $needle);
 		if (is_int($pos)) {
@@ -176,6 +176,7 @@ class qtype_canvas_renderer extends qtype_renderer {
         }
         $canvas .= "<canvas class=\"qtype_canvas\" width=\"".$bgimageArray[1]."\" height=\"".$bgimageArray[2]."\"style=\"background:url('$bgimageArray[0]')\"></canvas></div>";
         
+        
 		//$input = html_writer::empty_tag('input', $inputattributes) . $feedbackimg;
         
         
@@ -231,6 +232,7 @@ class qtype_canvas_renderer extends qtype_renderer {
 	}
 
 	public function correct_response(question_attempt $qa) {
+		return '';
 		$question = $qa->get_question();
 
 		$answer = $question->get_matching_answer($question->get_correct_response());

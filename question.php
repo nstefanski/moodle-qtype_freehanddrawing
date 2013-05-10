@@ -26,6 +26,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+require_once (dirname(__FILE__) . '/renderer.php');
 
 /**
  * Represents a short answer question.
@@ -80,59 +81,65 @@ class qtype_canvas_question extends question_graded_by_strategy
     }
 
     public function compare_response_with_answer(array $response, question_answer $answer) {
-		/* Voma start */
-		$temp1 = $this->answers;
-		$temp2 = reset($temp1); $strSolution = $temp2->answer;
-		$temp2 = next($temp1); $strURL = $temp2->answer;
-		$temp2 = next($temp1); $intRadius = $temp2->answer;
 
-		$arrT = self::getArray($strSolution); // Teacher
-		$arrS = self::getArray($response['answer']); // Student
+    	
+    	if ($answer->answer === '' || array_key_exists('answer', $response) === FALSE) {
+    		return false;
+    	}
+    	
+    	$correctAnswer = $answer->answer;
+    	$currentAnswer = $response['answer'];
+    	
+    	
+    	$correctAnswerData = base64_decode(qtype_canvas_renderer::strstr_after($correctAnswer, 'base64,'));
+    	$currentAnswerData = base64_decode(qtype_canvas_renderer::strstr_after($currentAnswer , 'base64,'));
+    		
+    	$correctAnswerImg =  imagecreatefromstring($correctAnswerData);
+    	$currentAnswerImg =  imagecreatefromstring($currentAnswerData);
+    	if ($correctAnswerImg === FALSE || $currentAnswerImg === FALSE) {
+    		return false;
+    	}
+    		
+    	$width = imagesx($correctAnswerImg);
+    	$height = imagesy($correctAnswerImg);
+    		
+    	$matchingPixels = 0;
+    	$totalPixels = 0;
+    	
+    	for ($x = 0; $x < $width; $x++) {
+    		for ($y = 0; $y < $height; $y++) {
+    			$rgbCorrectAns = imagecolorat($correctAnswerImg, $x, $y);
+    			$rgbCurrentAns = imagecolorat($currentAnswerImg, $x, $y);
+    			$rgbCorrectAnsArray = array(($rgbCorrectAns >> 16) & 0xFF, ($rgbCorrectAns >> 8) & 0xFF, $rgbCorrectAns & 0xFF);
+    			$rgbCurrentAnsArray = array(($rgbCurrentAns >> 16) & 0xFF, ($rgbCurrentAns >> 8) & 0xFF, $rgbCurrentAns & 0xFF);
+    			if ($rgbCorrectAnsArray[2] == 255 && $rgbCurrentAnsArray[2] == 255) {
+    				$matchingPixels++;
+    				$totalPixels++;
+    			} else if ($rgbCorrectAnsArray[2] == 255 && $rgbCurrentAnsArray[2] == 0) {
+    				$totalPixels++;
+    			} else if ($rgbCorrectAnsArray[2] == 0 && $rgbCurrentAnsArray[2] == 255) {
+    				$matchingPixels--;
+    			}
+    	
+    		}
+    	}
 
-		$intRadius2 = 4*$intRadius*$intRadius;
+    	imagedestroy($correctAnswerImg);
+    	imagedestroy($currentAnswerImg);
+    	
+    	$matchPercentage = ($matchingPixels / $totalPixels)*100;
+    		
 
-		$fltThreshold = (5+0.5*$this->usecase)/10;
-
-		$intTRight = 0; 
-		$intSRight = 0;
-
-		foreach ($arrT as $i => $valueT) {
-			foreach ($arrS as $j => $valueS) {
-				$fltDistance2 = pow($arrT[$i][0]-$arrS[$j][0],2) + pow($arrT[$i][1]-$arrS[$j][1],2);
-				if($intRadius2-$fltDistance2 >= 0){
-					if(!$arrT[$i][2]){$arrT[$i][2] = true; $intTRight++;}
-					if(!$arrS[$j][2]){$arrS[$j][2] = true; $intSRight++;}
-				}
-			}			
-		}
-		/* Voma end */
-
-		/* Voma edit start */
-        /* return self::compare_string_with_wildcard(
-                $response['answer'], $answer->answer, !$this->usecase); */
-		if(count($arrS) != 0){
-			return ($intTRight/count($arrT)*$intSRight/count($arrS) >= $fltThreshold ? true : false);
-		}else{
-			return false;
-		}
-		/* Voma end */
-    }
-
-	/* Voma start */
-    public static function getArray($strArray){
-		if($strArray != ""){
-			$arr1 = split(",", $strArray); $arr2;
-			foreach ($arr1 as $key => $value) {
-				if($key%2 == 0){
-					$arr2[$key/2][0] = $arr1[$key]; // x
-					$arr2[$key/2][1] = $arr1[$key+1]; // y
-					$arr2[$key/2][2] = false;
-				}
-			}
-			return $arr2;
-		}else{
-			return array();
-		}
+    	
+    	if (($this->threshold)*5+50 <= $matchPercentage) {
+    		$answer->fraction = 1;
+    		return true;
+    	}
+    	
+    	$answer->fraction = 0;
+    	return false;
+    	
+    	
 	}
 	/* Voma end */
 
