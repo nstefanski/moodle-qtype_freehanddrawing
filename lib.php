@@ -29,7 +29,7 @@ defined('MOODLE_INTERNAL') || die();
 
 
 /**
- * Checks file access for ddimageortext questions.
+ * Checks file access for canvas questions.
  */
 function qtype_canvas_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options=array()) {
     global $CFG;

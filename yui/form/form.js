@@ -69,7 +69,7 @@ YUI.add('moodle-qtype_canvas-form', function(Y) {
 	choose_new_image_file_click: function(e) {
 		if (this.is_canvas_empty(0) == false) {
 			if (confirm('You have drawn something onto the canvas. Choosing a new image file will erase this. Are you sure you want to go on?') == false) {
-				Y.one('.file-picker.fp-generallayout.yui3-panel-content.repository_upload').one('.yui3-button.yui3-button-close').simulate("click");
+				Y.one('.file-picker.fp-generallayout').one('.yui3-button.yui3-button-close').simulate("click");
 			}
 		}
 	},
@@ -113,10 +113,13 @@ YUI.add('moodle-qtype_canvas-form', function(Y) {
 			Y.one(SELECTORS.GENERICCANVAS).getDOMNode().width = image.width;
 			Y.one(SELECTORS.GENERICCANVAS).getDOMNode().height = image.height;
 			this.emptyCanvasDataURL[0] = Y.one(SELECTORS.GENERICCANVAS).getDOMNode().toDataURL();
-			this.create_canvas_context(0);
+			this.create_canvas_context(0, false);
 		}.bind(this);
 	},
-	create_canvas_context: function(questionID) {
+	create_canvas_context: function(questionID, applyTextArea) {
+		if (typeof applyTextArea == 'undefined') {
+			applyTextArea = true;
+		}
 		if (questionID == 0) {
 			canvasNode = Y.one(SELECTORS.GENERICCANVAS);
 		} else {
@@ -126,25 +129,32 @@ YUI.add('moodle-qtype_canvas-form', function(Y) {
 				}
 			}.bind(this));
 		}
-		textarea = this.canvas_get_textarea(canvasNode);
+		
 		this.canvasContext[questionID] = canvasNode.getDOMNode().getContext('2d');
 		this.canvasContext[questionID].lineWidth = this.get_drawing_radius(questionID);
 		this.canvasContext[questionID].lineJoin = 'round';
 		this.canvasContext[questionID].lineCap = 'round';
 		this.canvasContext[questionID].strokeStyle = 'blue';
-		if (textarea.get('value') != '') {
-			var img = new Image();
-			img.onload = function() {
-				this.canvasContext[questionID].drawImage(img, 0, 0);
-			}.bind(this);
-			img.src = textarea.get('value');
+		
+		textarea = this.canvas_get_textarea(canvasNode);
+		
+		if (applyTextArea == false) {
+			textarea.set('value', '');
+		} else {
+			if (textarea.get('value') != '') {
+				var img = new Image();
+				img.onload = function() {
+					this.canvasContext[questionID].drawImage(img, 0, 0);
+				}.bind(this);
+				img.src = textarea.get('value');
+			}
 		}
 	},
 	drawing_radius_change: function(e) {
 		if (this.is_canvas_empty(0) == false) {
 			if (confirm('If you change the drawing radius now, I will have to erase the whole canvas. Are you okay with that?') == true) {
 				Y.one(SELECTORS.GENERICCANVAS).getDOMNode().width = Y.one(SELECTORS.GENERICCANVAS).getDOMNode().width;
-				this.create_canvas_context(0);
+				this.create_canvas_context(0, false);
 			} else {
 				Y.one(SELECTORS.DRAWINGRADIUS).set('selectedIndex', (this.drawingRadius-1)/2);
 			}

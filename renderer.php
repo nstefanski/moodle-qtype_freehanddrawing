@@ -44,6 +44,79 @@ class qtype_canvas_renderer extends qtype_renderer {
 		return $pos;
 	}
 
+	public static function compare_drawings($teacherAnswer, $studentAnswer, $createBlendedImg = false) {
+
+		// Beginning of dataURL string: "data:image/png;base64,"
+		
+		$correctAnswerData = base64_decode(self::strstr_after($teacherAnswer, 'base64,'));
+		$currentAnswerData = base64_decode(self::strstr_after($studentAnswer , 'base64,'));
+			
+		$correctAnswerImg =  imagecreatefromstring($correctAnswerData);
+		$currentAnswerImg =  imagecreatefromstring($currentAnswerData);
+
+		imagealphablending( $correctAnswerImg, false );
+		imagesavealpha( $correctAnswerImg, true );
+			
+		imagealphablending( $currentAnswerImg, false );
+		imagesavealpha( $currentAnswerImg, true );
+		
+		$width = imagesx($correctAnswerImg);
+		$height = imagesy($correctAnswerImg);
+		
+		if ($createBlendedImg ===  true) {
+			$blendedImg = imagecreatefromstring($currentAnswerData);
+			imagealphablending( $blendedImg, false );
+			imagesavealpha( $blendedImg, true );
+			$green = imagecolorallocate($blendedImg, 0, 255, 0);
+			$blue = imagecolorallocate($blendedImg, 0, 0, 255);
+			$red = imagecolorallocate($blendedImg, 255, 0, 0);
+		}
+			
+		$matchingPixels = 0;
+		$teacherOnlyPixels = 0;
+		$studentOnlyPixels = 0;
+		for ($x = 0; $x < $width; $x++) {
+			for ($y = 0; $y < $height; $y++) {
+				$rgbCorrectAns = imagecolorat($correctAnswerImg, $x, $y);
+				$rgbCurrentAns = imagecolorat($currentAnswerImg, $x, $y);
+				$rgbCorrectAnsArray = array(($rgbCorrectAns >> 16) & 0xFF, ($rgbCorrectAns >> 8) & 0xFF, $rgbCorrectAns & 0xFF);
+				$rgbCurrentAnsArray = array(($rgbCurrentAns >> 16) & 0xFF, ($rgbCurrentAns >> 8) & 0xFF, $rgbCurrentAns & 0xFF);
+				if ($rgbCorrectAnsArray[2] == 255 && $rgbCurrentAnsArray[2] == 255) {
+					$matchingPixels++;
+					if ($createBlendedImg ===  true) {
+						imagesetpixel($blendedImg, $x, $y, $green);
+					}
+				} else if ($rgbCorrectAnsArray[2] == 255 && $rgbCurrentAnsArray[2] == 0) {
+					$teacherOnlyPixels++;
+					if ($createBlendedImg ===  true) {
+						imagesetpixel($blendedImg, $x, $y, $blue);
+					}
+				} else if ($rgbCorrectAnsArray[2] == 0 && $rgbCurrentAnsArray[2] == 255) {
+					$studentOnlyPixels++;
+					if ($createBlendedImg ===  true) {
+						imagesetpixel($blendedImg, $x, $y, $red);
+					}
+				}
+			}
+		}
+		
+		imagedestroy($correctAnswerImg);
+		imagedestroy($currentAnswerImg);
+		
+		$matchPercentage = ($matchingPixels / ($matchingPixels + $teacherOnlyPixels + $studentOnlyPixels))*100;
+		
+		if ($createBlendedImg ===  true) {
+			ob_start();
+			imagepng($blendedImg);
+			$blendedImgData = ob_get_contents();
+			ob_end_clean();
+			$blendedImgDataURL = 'data:image/png;base64,' . base64_encode($blendedImgData);
+			imagedestroy($blendedImg);
+			return array($blendedImgDataURL, $matchPercentage);
+		}
+		return $matchPercentage;
+	}
+	
     public function formulation_and_controls(question_attempt $qa, question_display_options $options) {
 
 		$question = $qa->get_question();
@@ -63,66 +136,12 @@ class qtype_canvas_renderer extends qtype_renderer {
   
 		
 		if ($options->correctness) {
-			// Beginning of dataURL string: "data:image/png;base64,"
 			
 			$correctAnswer = reset($question->answers)->answer;
-			$correctAnswerData = base64_decode(self::strstr_after($correctAnswer, 'base64,'));
-			$currentAnswerData = base64_decode(self::strstr_after($currentAnswer , 'base64,'));
-			
-			$correctAnswerImg =  imagecreatefromstring($correctAnswerData);
-			$currentAnswerImg =  imagecreatefromstring($currentAnswerData);
+	
+			list($blendedImgDataURL, $matchPercentage) = self::compare_drawings($correctAnswer, $currentAnswer, true);
 			
 			
-			$blendedImg = imagecreatefromstring($currentAnswerData);
-			
-			imagealphablending( $correctAnswerImg, false );
-			imagesavealpha( $correctAnswerImg, true );
-			
-			imagealphablending( $currentAnswerImg, false );
-			imagesavealpha( $currentAnswerImg, true );
-			
-			imagealphablending( $blendedImg, false );
-			imagesavealpha( $blendedImg, true );
-			
-			$width = imagesx($blendedImg);
-			$height = imagesy($blendedImg);
-			$green = imagecolorallocate($blendedImg, 0, 255, 0);
-			$blue = imagecolorallocate($blendedImg, 0, 0, 255);
-			$red = imagecolorallocate($blendedImg, 255, 0, 0);
-			
-			$matchingPixels = 0;
-			$totalPixels = 0;
-			for ($x = 0; $x < $width; $x++) {
-				for ($y = 0; $y < $height; $y++) {
-					$rgbCorrectAns = imagecolorat($correctAnswerImg, $x, $y);
-					$rgbCurrentAns = imagecolorat($currentAnswerImg, $x, $y);
-					$rgbCorrectAnsArray = array(($rgbCorrectAns >> 16) & 0xFF, ($rgbCorrectAns >> 8) & 0xFF, $rgbCorrectAns & 0xFF);
-					$rgbCurrentAnsArray = array(($rgbCurrentAns >> 16) & 0xFF, ($rgbCurrentAns >> 8) & 0xFF, $rgbCurrentAns & 0xFF);
-					if ($rgbCorrectAnsArray[2] == 255 && $rgbCurrentAnsArray[2] == 255) {
-						$matchingPixels++;
-						$totalPixels++;
-						imagesetpixel($blendedImg, $x, $y, $green);
-					} else if ($rgbCorrectAnsArray[2] == 255 && $rgbCurrentAnsArray[2] == 0) {
-						imagesetpixel($blendedImg, $x, $y, $blue);
-						$totalPixels++;
-					} else if ($rgbCorrectAnsArray[2] == 0 && $rgbCurrentAnsArray[2] == 255) {
-						imagesetpixel($blendedImg, $x, $y, $red);
-						$matchingPixels--;
-					}
-						
-				}
-			}
-			
-			$matchPercentage = ($matchingPixels / $totalPixels)*100;
-			ob_start();
-			imagepng($blendedImg);
-			$blendedImgData = ob_get_contents();
-			ob_end_clean();
-			$blendedImgDataURL = 'data:image/png;base64,' . base64_encode($blendedImgData);
-			
-			imagedestroy($correctAnswerImg);
-			imagedestroy($currentAnswerImg);
-			imagedestroy($blendedImg);
 			
 			$this->page->requires->yui_module('moodle-qtype_canvas-form',
 					'Y.Moodle.qtype_canvas.form.init', array($question->id, $question->radius, $blendedImgDataURL));
@@ -246,29 +265,38 @@ class qtype_canvas_renderer extends qtype_renderer {
 
 
 
-    protected static function get_url_for_image(question_attempt $qa, $filearea, $itemid = 0) {
-        $question = $qa->get_question();
-        $qubaid = $qa->get_usage_id();
-        $slot = $qa->get_slot();
-        $fs = get_file_storage();
-        $componentname = $question->qtype->plugin_name();
-        $draftfiles = $fs->get_area_files($question->contextid, $componentname,
-                $filearea, $question->id, 'id');
-        if ($draftfiles) {
-            foreach ($draftfiles as $file) {
-                if ($file->is_directory()) {
-                    continue;
-                }
-                $url = moodle_url::make_pluginfile_url($question->contextid, $componentname,
-                		$filearea, "$qubaid/$slot/$question->id", '/',
-                		$file->get_filename());
-                $image = imagecreatefromstring($file->get_content());
-                $width = imagesx($image);
-                $height = imagesy($image);
-                return array($url->out(), $width, $height);
-            }
-        }
-        return null;
+    public static function get_url_for_image(question_attempt $qa, $filearea, $itemid = 0) {
+    	global $CFG;
+    	$question = $qa->get_question();
+
+
+    	$qubaid = $qa->get_usage_id();
+    	$slot = $qa->get_slot();
+
+
+
+    	$fs = get_file_storage();
+    	$componentname = $question->qtype->plugin_name();
+    	$draftfiles = $fs->get_area_files($question->contextid, $componentname, $filearea, $question->id, 'id');
+    	if ($draftfiles) {
+    		foreach ($draftfiles as $file) {
+    			if ($file->is_directory()) {
+    				continue;
+    			}
+    			$url = moodle_url::make_pluginfile_url($question->contextid, $componentname, $filearea, "$qubaid/$slot/$question->id", '/', $file->get_filename());
+    			//$url = moodle_url::make_pluginfile_url($question->contextid, $componentname, $filearea, "29/1/$question->id", '/', $file->get_filename());
+    			//$url = moodle_url::make_pluginfile_url($file->get_contextid(), $file->get_component(), $file->get_filearea(), null, $file->get_filepath(), $file->get_filename());
+    			//$url = $CFG->wwwroot . '/pluginfile.php/' . $file->get_contextid() . '/' . $file->get_component(). '/' . $file->get_filearea() . '/arbitrary/extra/infomation.ext';
+    			//$url = "{$CFG->wwwroot}/pluginfile.php/{$file->get_contextid()}/qtype_canvas}";
+    			//$url .= $file->get_filepath().$file->get_itemid().'/'.$filename;
+    			
+    			$image = imagecreatefromstring($file->get_content());
+    			$width = imagesx($image);
+    			$height = imagesy($image);
+    			return array($url->out(), $width, $height);
+    		}
+    	}
+    	return null;
     }
 
 

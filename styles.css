@@ -4,6 +4,13 @@
 .qtype_canvas_textarea {
 	display: none;
 }
+.fitem_id_qtype_canvas_textarea_id_0 {
+	display: none;
+}
+
+#fitem_id_qtype_canvas_textarea_id_0 {
+		display: none;
+}
 .qtype_canvas {
     margin-left: auto; 
     margin-right: auto; 

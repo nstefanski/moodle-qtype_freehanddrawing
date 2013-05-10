@@ -65,7 +65,7 @@ class qtype_canvas_edit_form extends question_edit_form {
  
         $mform->addElement('textarea', 'qtype_canvas_textarea_id_0', get_string("introtext", "qtype_canvas"), 'class="qtype_canvas_textarea" wrap="virtual" rows="20" cols="50"');
         $mform->addElement('filepicker', 'qtype_canvas_image_file', get_string('file'), null,
-                           array('maxbytes' => $maxbytes, 'accepted_types' => '*'));
+                           array('maxbytes' => 31457280, 'accepted_types' => array('image', 'picture')));
         $mform->closeHeaderBefore('drawsolution');
         $mform->addElement('html', '<canvas class="qtype_canvas" style="display: none;">');
         //$this->add_per_answer_fields($mform, get_string('answerno', 'qtype_canvas', '{no}'), question_bank::fraction_options());

@@ -87,49 +87,7 @@ class qtype_canvas_question extends question_graded_by_strategy
     		return false;
     	}
     	
-    	$correctAnswer = $answer->answer;
-    	$currentAnswer = $response['answer'];
-    	
-    	
-    	$correctAnswerData = base64_decode(qtype_canvas_renderer::strstr_after($correctAnswer, 'base64,'));
-    	$currentAnswerData = base64_decode(qtype_canvas_renderer::strstr_after($currentAnswer , 'base64,'));
-    		
-    	$correctAnswerImg =  imagecreatefromstring($correctAnswerData);
-    	$currentAnswerImg =  imagecreatefromstring($currentAnswerData);
-    	if ($correctAnswerImg === FALSE || $currentAnswerImg === FALSE) {
-    		return false;
-    	}
-    		
-    	$width = imagesx($correctAnswerImg);
-    	$height = imagesy($correctAnswerImg);
-    		
-    	$matchingPixels = 0;
-    	$totalPixels = 0;
-    	
-    	for ($x = 0; $x < $width; $x++) {
-    		for ($y = 0; $y < $height; $y++) {
-    			$rgbCorrectAns = imagecolorat($correctAnswerImg, $x, $y);
-    			$rgbCurrentAns = imagecolorat($currentAnswerImg, $x, $y);
-    			$rgbCorrectAnsArray = array(($rgbCorrectAns >> 16) & 0xFF, ($rgbCorrectAns >> 8) & 0xFF, $rgbCorrectAns & 0xFF);
-    			$rgbCurrentAnsArray = array(($rgbCurrentAns >> 16) & 0xFF, ($rgbCurrentAns >> 8) & 0xFF, $rgbCurrentAns & 0xFF);
-    			if ($rgbCorrectAnsArray[2] == 255 && $rgbCurrentAnsArray[2] == 255) {
-    				$matchingPixels++;
-    				$totalPixels++;
-    			} else if ($rgbCorrectAnsArray[2] == 255 && $rgbCurrentAnsArray[2] == 0) {
-    				$totalPixels++;
-    			} else if ($rgbCorrectAnsArray[2] == 0 && $rgbCurrentAnsArray[2] == 255) {
-    				$matchingPixels--;
-    			}
-    	
-    		}
-    	}
-
-    	imagedestroy($correctAnswerImg);
-    	imagedestroy($currentAnswerImg);
-    	
-    	$matchPercentage = ($matchingPixels / $totalPixels)*100;
-    		
-
+    	$matchPercentage = qtype_canvas_renderer::compare_drawings($answer->answer, $response['answer']);
     	
     	if (($this->threshold)*5+50 <= $matchPercentage) {
     		$answer->fraction = 1;
@@ -143,24 +101,24 @@ class qtype_canvas_question extends question_graded_by_strategy
 	}
 	/* Voma end */
 
-    public static function compare_string_with_wildcard($string, $pattern, $ignorecase) {
-        // Break the string on non-escaped asterisks.
-        $bits = preg_split('/(?<!\\\\)\*/', $pattern);
-        // Escape regexp special characters in the bits.
-        $excapedbits = array();
-        foreach ($bits as $bit) {
-            $excapedbits[] = preg_quote(str_replace('\*', '*', $bit));
-        }
-        // Put it back together to make the regexp.
-        $regexp = '|^' . implode('.*', $excapedbits) . '$|u';
+//     public static function compare_string_with_wildcard($string, $pattern, $ignorecase) {
+//         // Break the string on non-escaped asterisks.
+//         $bits = preg_split('/(?<!\\\\)\*/', $pattern);
+//         // Escape regexp special characters in the bits.
+//         $excapedbits = array();
+//         foreach ($bits as $bit) {
+//             $excapedbits[] = preg_quote(str_replace('\*', '*', $bit));
+//         }
+//         // Put it back together to make the regexp.
+//         $regexp = '|^' . implode('.*', $excapedbits) . '$|u';
 
-        // Make the match insensitive if requested to.
-        if ($ignorecase) {
-            $regexp .= 'i';
-        }
+//         // Make the match insensitive if requested to.
+//         if ($ignorecase) {
+//             $regexp .= 'i';
+//         }
 
-        return preg_match($regexp, trim($string));
-    }
+//         return preg_match($regexp, trim($string));
+//     }
 
     public function check_file_access($qa, $options, $component, $filearea,
             $args, $forcedownload) {
