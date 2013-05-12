@@ -1,15 +1,15 @@
 #fitem_id_qtype_canvas_textarea {
-    display: none;
+    display: block;
 }
 .qtype_canvas_textarea {
-	display: none;
+	display: block;
 }
 .fitem_id_qtype_canvas_textarea_id_0 {
-	display: none;
+	display: block;
 }
 
 #fitem_id_qtype_canvas_textarea_id_0 {
-		display: none;
+		display: block;
 }
 .qtype_canvas {
     margin-left: auto; 

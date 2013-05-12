@@ -46,6 +46,8 @@ class qtype_canvas_renderer extends qtype_renderer {
 
 	public static function compare_drawings($teacherAnswer, $studentAnswer, $createBlendedImg = false) {
 
+	//	ini_set('memory_limit', '-1');
+		
 		// Beginning of dataURL string: "data:image/png;base64,"
 		
 		$correctAnswerData = base64_decode(self::strstr_after($teacherAnswer, 'base64,'));
@@ -114,6 +116,7 @@ class qtype_canvas_renderer extends qtype_renderer {
 	}
 	
 	public static function toDataURL_from_gdImage($gdImage) {
+//		ini_set('memory_limit', '-1');
 		ob_start();
 		imagepng($gdImage);
 		$ImgData = ob_get_contents();
@@ -202,7 +205,7 @@ class qtype_canvas_renderer extends qtype_renderer {
 			$inputattributes['size'] = round(strlen($placeholder) * 1.1);
 		}
 
-        $bgimageArray = self::get_image_for_question($qa->get_question());
+        $bgimageArray = self::get_image_for_question($question);
         
         $canvas = "<div class=\"qtype_canvas_id_" . $question->id . "\">";
         if ($options->correctness) {
@@ -284,7 +287,8 @@ class qtype_canvas_renderer extends qtype_renderer {
 
     public static function get_image_for_question($question) {
     	$fs = get_file_storage();
-    	$draftfiles = $fs->get_area_files($question->contextid,  $question->qtype->plugin_name(), 'qtype_canvas_image_file', $question->id, 'id');
+    	
+    	$draftfiles = $fs->get_area_files($question->contextid,  'qtype_canvas', 'qtype_canvas_image_file', $question->id, 'id');
     	if ($draftfiles) {
     		foreach ($draftfiles as $file) {
     			if ($file->is_directory()) {

@@ -25,6 +25,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+require_once (dirname(__FILE__) . '/renderer.php');
+
 /**
  * Short canvas question editing form definition.
  *
@@ -35,6 +37,25 @@ class qtype_canvas_edit_form extends question_edit_form {
 
     protected function definition_inner($mform) {
         global $PAGE, $CFG;
+        
+        
+        if (array_key_exists('id', $this->question) === true) {
+        	$question = $this->question;
+        	if (array_key_exists('contextid', $question) === false || array_key_exists('answers', $question) === false) {
+        		$question = question_bank::load_question($question->id, false);
+        	}
+        	// Question already exists! We are in edit mode.
+        	$bgimageArray = qtype_canvas_renderer::get_image_for_question($question);
+        	$canvasHTMLParams = "width=\"".$bgimageArray[1]."\" height=\"".$bgimageArray[2]."\"style=\"background:url('$bgimageArray[0]')\"";
+        	
+        	$canvasTextAreaPreexistingAnswer = reset($question->answers)->answer;
+        
+        } else {
+        	$canvasHTMLParams = 'style="display: none;"';
+        	$canvasTextAreaPreexistingAnswer = '';
+        }
+        
+        
         $mform->addElement('header', 'qtype_canvas_drawing_parameters', get_string('drawing_parameters', 'qtype_canvas'));
         $mform->addElement('select', 'radius',
                 get_string('radius', 'qtype_canvas'), array(
@@ -64,18 +85,20 @@ class qtype_canvas_edit_form extends question_edit_form {
                 10 => 100));
  
         $mform->addElement('textarea', 'qtype_canvas_textarea_id_0', get_string("introtext", "qtype_canvas"), 'class="qtype_canvas_textarea" wrap="virtual" rows="20" cols="50"');
+        $mform->setDefault('qtype_canvas_textarea_id_0', $canvasTextAreaPreexistingAnswer);
         $mform->addElement('filepicker', 'qtype_canvas_image_file', get_string('file'), null,
-                           array('maxbytes' => 31457280, 'accepted_types' => array('image', 'picture')));
+                           array('maxbytes' => 1572864/*1.5MB*/, 'accepted_types' => array('image', 'picture')));
         $mform->closeHeaderBefore('drawsolution');
        // $mform->addElement('html', '<img ALT="Erase Canvas" SRC="'.$CFG->wwwroot . '/question/type/canvas/pix/Eraser-icon.png" width=64 height=64');
-        $mform->addElement('html', '<canvas class="qtype_canvas" style="display: none;">');
+
+        $mform->addElement('html', '<canvas class="qtype_canvas" '.$canvasHTMLParams.'>');
         //$this->add_per_answer_fields($mform, get_string('answerno', 'qtype_canvas', '{no}'), question_bank::fraction_options());
 
         $this->add_interactive_settings();
 
 
     }
-    public function js_call() {
+    public function js_call($question) {
         global $PAGE;
         $params = array('nothing'=>1);
         $PAGE->requires->yui_module('moodle-qtype_canvas-form',
@@ -86,7 +109,7 @@ class qtype_canvas_edit_form extends question_edit_form {
         $question = parent::data_preprocessing($question);
         $question = $this->data_preprocessing_answers($question);
         $question = $this->data_preprocessing_hints($question);
-        $this->js_call();
+        $this->js_call($question);
         return $question;
     }
 

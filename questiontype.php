@@ -57,7 +57,7 @@ class qtype_canvas extends question_type {
     }
 
     public function save_question_options($question) {
-        global $DB;
+        global $DB, $USER;
         $result = new stdClass();
 
         $context = $question->context;
@@ -109,9 +109,8 @@ class qtype_canvas extends question_type {
         }
 
         // Delete any left over old answer records.
-        $fs = get_file_storage();
+       
         foreach ($oldanswers as $oldanswer) {
-            $fs->delete_area_files($context->id, 'question', 'answerfeedback', $oldanswer->id);
             $DB->delete_records('question_answers', array('id' => $oldanswer->id));
         }
 
@@ -122,9 +121,15 @@ class qtype_canvas extends question_type {
         $answer->answer = $question->qtype_canvas_textarea_id_0;
         $answer->feedback = '';
         $answer->id = $DB->insert_record('question_answers', $answer);
-
-        file_save_draft_area_files($question->qtype_canvas_image_file, $question->context->id, 'qtype_canvas', 'qtype_canvas_image_file', $question->id, array('subdirs' => 0, 'maxbytes' => 0, 'maxfiles' => 1));
-
+        
+        $fs = get_file_storage();
+        $usercontext = get_context_instance(CONTEXT_USER, $USER->id);
+        $draftfiles = $fs->get_area_files($usercontext->id, 'user', 'draft', $question->qtype_canvas_image_file, 'id');
+        //$oldfiles   = $fs->get_area_files($contextid, $component, $filearea, $itemid, 'id');
+        if (count($draftfiles) >= 2) {
+        	$fs->delete_area_files( $question->context->id, 'qtype_canvas', 'qtype_canvas_image_file', $question->id);
+        	file_save_draft_area_files($question->qtype_canvas_image_file, $question->context->id, 'qtype_canvas', 'qtype_canvas_image_file', $question->id, array('subdirs' => 0, 'maxbytes' => 0, 'maxfiles' => 1));
+        }
 
 
 
