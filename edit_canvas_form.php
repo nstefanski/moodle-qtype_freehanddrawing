@@ -48,10 +48,13 @@ class qtype_canvas_edit_form extends question_edit_form {
         	$bgimageArray = qtype_canvas_renderer::get_image_for_question($question);
         	$canvasHTMLParams = "width=\"".$bgimageArray[1]."\" height=\"".$bgimageArray[2]."\"style=\"background:url('$bgimageArray[0]')\"";
         	
+        	$eraserHTMLParams = '';
+        	
         	$canvasTextAreaPreexistingAnswer = reset($question->answers)->answer;
         
         } else {
         	$canvasHTMLParams = 'style="display: none;"';
+        	$eraserHTMLParams = 'style="display: none;"';
         	$canvasTextAreaPreexistingAnswer = '';
         }
         
@@ -89,16 +92,16 @@ class qtype_canvas_edit_form extends question_edit_form {
         $mform->addElement('filepicker', 'qtype_canvas_image_file', get_string('file'), null,
                            array('maxbytes' => 1572864/*1.5MB*/, 'accepted_types' => array('image', 'picture')));
         $mform->closeHeaderBefore('drawsolution');
-       // $mform->addElement('html', '<img ALT="Erase Canvas" SRC="'.$CFG->wwwroot . '/question/type/canvas/pix/Eraser-icon.png" width=64 height=64');
+        //$mform->addElement('html', '<img ALT="Erase Canvas" SRC="'.$CFG->wwwroot . '/question/type/canvas/pix/Eraser-icon.png" CLASS="qtype_canvas_eraser" ID="qtype_canvas_eraser_id_0" '.$eraserHTMLParams.'>');
 
-        $mform->addElement('html', '<canvas class="qtype_canvas" '.$canvasHTMLParams.'>');
+        $mform->addElement('html', '<div class="qtype_canvas_container_div" '.$eraserHTMLParams.'><img ALT="Erase Canvas" SRC="'.$CFG->wwwroot . '/question/type/canvas/pix/Eraser-icon.png" CLASS="qtype_canvas_eraser" ID="qtype_canvas_eraser_id_0" '.$eraserHTMLParams.'><canvas class="qtype_canvas" '.$canvasHTMLParams.'>');
         //$this->add_per_answer_fields($mform, get_string('answerno', 'qtype_canvas', '{no}'), question_bank::fraction_options());
 
         $this->add_interactive_settings();
 
 
     }
-    public function js_call($question) {
+    public function js_call() {
         global $PAGE;
         $params = array('nothing'=>1);
         $PAGE->requires->yui_module('moodle-qtype_canvas-form',
@@ -109,7 +112,7 @@ class qtype_canvas_edit_form extends question_edit_form {
         $question = parent::data_preprocessing($question);
         $question = $this->data_preprocessing_answers($question);
         $question = $this->data_preprocessing_hints($question);
-        $this->js_call($question);
+        $this->js_call();
         return $question;
     }
 

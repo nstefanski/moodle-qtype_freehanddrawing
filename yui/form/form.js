@@ -11,6 +11,8 @@ YUI.add('moodle-qtype_canvas-form', function(Y) {
 			FILEPICKER: '#id_qtype_canvas_image_file',
 			DRAWINGRADIUS: '#id_radius',
 			CHOOSEFILEBUTTON: 'input[name="qtype_canvas_image_filechoose"]',
+			ERASERBUTTON: 'img[class="qtype_canvas_eraser"]',
+			CONTAINERDIV: 'div[class="qtype_canvas_container_div"]',
 	};
 	Y.namespace('Moodle.qtype_canvas.form');
 
@@ -22,9 +24,13 @@ YUI.add('moodle-qtype_canvas-form', function(Y) {
 			drawingRadius: new Array(),
 			emptyCanvasDataURL: new Array(),
 			
-			
-			
-			
+			filepicker_change_sub: null,
+			choose_new_image_file_click_sub: null,
+			eraser_click_sub: null,
+			canvas_mousedown_sub: null,
+			canvas_mouseup_sub: null,
+			drawing_radius_change_sub: null,
+				
 			init: function(questionID, drawingRadius, correctAnswer) {
 				if (typeof correctAnswer != 'undefined') {
 					this.drawingRadius[questionID] = drawingRadius;
@@ -36,15 +42,47 @@ YUI.add('moodle-qtype_canvas-form', function(Y) {
 						this.emptyCanvasDataURL[questionID] = Y.one(SELECTORS.GENERICCANVAS).getDOMNode().toDataURL();
 						this.create_canvas_context(questionID);
 					}
-					Y.delegate('change',    this.filepicker_change,     Y.config.doc, SELECTORS.FILEPICKER, this);
-					Y.delegate('click', this.choose_new_image_file_click, Y.config.doc, SELECTORS.CHOOSEFILEBUTTON, this);
-					Y.delegate('mousedown', this.canvas_mousedown,  Y.config.doc, SELECTORS.GENERICCANVAS, this);
-					Y.delegate('mouseup',   this.canvas_mouseup,    Y.config.doc, SELECTORS.GENERICCANVAS, this);
-					Y.delegate('change', this.drawing_radius_change, Y.config.doc, SELECTORS.DRAWINGRADIUS, this);
+					
+					if(!this.filepicker_change_sub) { 
+						this.filepicker_change_sub = Y.delegate('change',    this.filepicker_change,     Y.config.doc, SELECTORS.FILEPICKER, this); 
+					}
+					if(!this.choose_new_image_file_click_sub) {
+						this.choose_new_image_file_click_sub = Y.delegate('click', this.choose_new_image_file_click, Y.config.doc, SELECTORS.CHOOSEFILEBUTTON, this); 
+					}
+					if(!this.eraser_click_sub) { 
+						this.eraser_click_sub =  Y.delegate('mouseup', this.eraser_click, Y.config.doc, SELECTORS.ERASERBUTTON, this);
+					}
+					if(!this.canvas_mousedown_sub) { 
+						this.canvas_mousedown_sub = Y.delegate('mousedown', this.canvas_mousedown,  Y.config.doc, SELECTORS.GENERICCANVAS, this); 
+					}
+					if(!this.canvas_mouseup_sub) { 
+						this.canvas_mouseup_sub =  Y.delegate('mouseup',   this.canvas_mouseup,    Y.config.doc, SELECTORS.GENERICCANVAS, this); 
+					}
+					if(!this.drawing_radius_change_sub) { 
+						this.drawing_radius_change_sub =  Y.delegate('change', this.drawing_radius_change, Y.config.doc, SELECTORS.DRAWINGRADIUS, this); 
+					}
 				}
 	
 	},
 	
+	eraser_click: function(e) {
+		questionID = this.canvas_get_question_id(e.currentTarget);
+		if (questionID == 0) {
+			canvasNode = Y.one(SELECTORS.GENERICCANVAS);
+		} else {
+			Y.all(SELECTORS.GENERICCANVAS).each(function(node) {
+				if (node.ancestor().getAttribute('class') == 'qtype_canvas_id_' + questionID) {
+					canvasNode = node;
+				}
+			}.bind(this));
+		}
+		if (this.is_canvas_empty(questionID) == false) {
+			if (confirm('Are you sure you want to erase the canvas?') == true) {
+				canvasNode.getDOMNode().width = canvasNode.getDOMNode().width;
+				this.create_canvas_context(questionID, false);
+			}
+		}
+	},
 	
 	draw_correct_answer: function(questionID, correctAnswer) {
 		Y.all(SELECTORS.GENERICCANVAS).each(function(node) {
@@ -110,6 +148,14 @@ YUI.add('moodle-qtype_canvas-form', function(Y) {
 				backgroundImage: "url('" + imgURL + "')",
 				display: 'block'
 			});
+			Y.one(SELECTORS.ERASERBUTTON).setStyles({
+				display: 'block'
+			});
+			Y.one(SELECTORS.CONTAINERDIV).setStyles({
+				display: 'inline-block'
+			});
+			
+			
 			Y.one(SELECTORS.GENERICCANVAS).getDOMNode().width = image.width;
 			Y.one(SELECTORS.GENERICCANVAS).getDOMNode().height = image.height;
 			this.emptyCanvasDataURL[0] = Y.one(SELECTORS.GENERICCANVAS).getDOMNode().toDataURL();

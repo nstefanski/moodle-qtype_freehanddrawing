@@ -138,6 +138,8 @@ class qtype_canvas_renderer extends qtype_renderer {
 	}
 	
     public function formulation_and_controls(question_attempt $qa, question_display_options $options) {
+    	
+    	global $CFG;
 
 		$question = $qa->get_question();
 		
@@ -211,6 +213,7 @@ class qtype_canvas_renderer extends qtype_renderer {
         if ($options->correctness) {
         	$canvas .= "<h1>".sprintf('%0.2f', $matchPercentage)."% out of necessary ".sprintf('%0.2f', $question->threshold*5+50)."%.</h1><hr>" . $feedbackimg . "<hr>";
         } else {
+        	$canvas .= '<img ALT="Erase Canvas" SRC="'.$CFG->wwwroot . '/question/type/canvas/pix/Eraser-icon.png" CLASS="qtype_canvas_eraser">';
         	$canvas .= "<textarea class=\"qtype_canvas_textarea\" name=\"$inputname\" id=\"qtype_canvas_textarea_id_".$question->id."\" rows=20 cols=50>$currentAnswer</textarea>";
         }
         $canvas .= "<canvas class=\"qtype_canvas\" width=\"".$bgimageArray[1]."\" height=\"".$bgimageArray[2]."\"style=\"background:url('$bgimageArray[0]')\"></canvas></div>";

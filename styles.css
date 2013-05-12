@@ -1,20 +1,38 @@
 #fitem_id_qtype_canvas_textarea {
-    display: block;
+    display: none;
 }
 .qtype_canvas_textarea {
-	display: block;
+	display: none;
 }
 .fitem_id_qtype_canvas_textarea_id_0 {
-	display: block;
+	display: none;
 }
 
 #fitem_id_qtype_canvas_textarea_id_0 {
-		display: block;
+		display: none;
 }
 .qtype_canvas {
+	align: center;
     margin-left: auto; 
     margin-right: auto; 
     margin-top:5px; 
     border: 1px solid black; 
     cursor: crosshair;
+    display: block;
+}
+.qtype_canvas_eraser {
+	cursor: pointer;
+	text-align: left;
+	width: 32px;
+	height: 32px;
+	display: block;
+}
+.qtype_canvas_container_div {
+margin: 10px;
+    padding: 10px;
+    background-image: url('http://www.michaelkuhlmann.com/hope/wp-content/uploads/texture-wood-purgo.jpg');
+    background-position:right top;
+    text-align: center;
+    display: inline-block;
+        border: 1px dashed black; 
 }
