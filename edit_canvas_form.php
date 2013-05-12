@@ -34,7 +34,7 @@ defined('MOODLE_INTERNAL') || die();
 class qtype_canvas_edit_form extends question_edit_form {
 
     protected function definition_inner($mform) {
-        global $PAGE;
+        global $PAGE, $CFG;
         $mform->addElement('header', 'qtype_canvas_drawing_parameters', get_string('drawing_parameters', 'qtype_canvas'));
         $mform->addElement('select', 'radius',
                 get_string('radius', 'qtype_canvas'), array(
@@ -67,6 +67,7 @@ class qtype_canvas_edit_form extends question_edit_form {
         $mform->addElement('filepicker', 'qtype_canvas_image_file', get_string('file'), null,
                            array('maxbytes' => 31457280, 'accepted_types' => array('image', 'picture')));
         $mform->closeHeaderBefore('drawsolution');
+       // $mform->addElement('html', '<img ALT="Erase Canvas" SRC="'.$CFG->wwwroot . '/question/type/canvas/pix/Eraser-icon.png" width=64 height=64');
         $mform->addElement('html', '<canvas class="qtype_canvas" style="display: none;">');
         //$this->add_per_answer_fields($mform, get_string('answerno', 'qtype_canvas', '{no}'), question_bank::fraction_options());
 

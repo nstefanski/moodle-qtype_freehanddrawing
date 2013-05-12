@@ -69,34 +69,36 @@ class qtype_canvas extends question_type {
         $maxfraction = -1;
 
         // Insert all the new answers
-        foreach ($question->answer as $key => $answerdata) {
-            // Check for, and ignore, completely blank answer from the form.
-            if (trim($answerdata) == '' && $question->fraction[$key] == 0 &&
-                    html_is_blank($question->feedback[$key]['text'])) {
-                continue;
-            }
+        if (array_key_exists('answer', $question)) {
+        	foreach ($question->answer as $key => $answerdata) {
+        		// Check for, and ignore, completely blank answer from the form.
+        		if (trim($answerdata) == '' && $question->fraction[$key] == 0 &&
+        		html_is_blank($question->feedback[$key]['text'])) {
+        			continue;
+        		}
 
-            // Update an existing answer if possible.
-            $answer = array_shift($oldanswers);
-            if (!$answer) {
-                $answer = new stdClass();
-                $answer->question = $question->id;
-                $answer->answer = '';
-                $answer->feedback = '';
-                $answer->id = $DB->insert_record('question_answers', $answer);
-            }
+        		// Update an existing answer if possible.
+        		$answer = array_shift($oldanswers);
+        		if (!$answer) {
+        			$answer = new stdClass();
+        			$answer->question = $question->id;
+        			$answer->answer = '';
+        			$answer->feedback = '';
+        			$answer->id = $DB->insert_record('question_answers', $answer);
+        		}
 
-            $answer->answer   = trim($answerdata);
-            $answer->fraction = $question->fraction[$key];
-            $answer->feedback = $this->import_or_save_files($question->feedback[$key],
-                    $context, 'question', 'answerfeedback', $answer->id);
-            $answer->feedbackformat = $question->feedback[$key]['format'];
-            $DB->update_record('question_answers', $answer);
+        		$answer->answer   = trim($answerdata);
+        		$answer->fraction = $question->fraction[$key];
+        		$answer->feedback = $this->import_or_save_files($question->feedback[$key],
+        				$context, 'question', 'answerfeedback', $answer->id);
+        		$answer->feedbackformat = $question->feedback[$key]['format'];
+        		$DB->update_record('question_answers', $answer);
 
-            $answers[] = $answer->id;
-            if ($question->fraction[$key] > $maxfraction) {
-                $maxfraction = $question->fraction[$key];
-            }
+        		$answers[] = $answer->id;
+        		if ($question->fraction[$key] > $maxfraction) {
+        			$maxfraction = $question->fraction[$key];
+        		}
+        	}
         }
 
         $question->answers = implode(',', $answers);
@@ -121,9 +123,7 @@ class qtype_canvas extends question_type {
         $answer->feedback = '';
         $answer->id = $DB->insert_record('question_answers', $answer);
 
-        file_save_draft_area_files($question->qtype_canvas_image_file, $question->context->id,
-                'qtype_canvas', 'qtype_canvas_image_file', $question->id,
-                array('subdirs' => 0, 'maxbytes' => 0, 'maxfiles' => 1));
+        file_save_draft_area_files($question->qtype_canvas_image_file, $question->context->id, 'qtype_canvas', 'qtype_canvas_image_file', $question->id, array('subdirs' => 0, 'maxbytes' => 0, 'maxfiles' => 1));
 
 
 

@@ -106,15 +106,32 @@ class qtype_canvas_renderer extends qtype_renderer {
 		$matchPercentage = ($matchingPixels / ($matchingPixels + $teacherOnlyPixels + $studentOnlyPixels))*100;
 		
 		if ($createBlendedImg ===  true) {
-			ob_start();
-			imagepng($blendedImg);
-			$blendedImgData = ob_get_contents();
-			ob_end_clean();
-			$blendedImgDataURL = 'data:image/png;base64,' . base64_encode($blendedImgData);
+			$blendedImgDataURL = self::toDataURL_from_gdImage($blendedImg);
 			imagedestroy($blendedImg);
 			return array($blendedImgDataURL, $matchPercentage);
 		}
 		return $matchPercentage;
+	}
+	
+	public static function toDataURL_from_gdImage($gdImage) {
+		ob_start();
+		imagepng($gdImage);
+		$ImgData = ob_get_contents();
+		ob_end_clean();
+		
+		
+		stream_wrapper_register("BlobDataAsFileStream", "blob_data_as_file_stream");
+		
+		//Store $swf_blob_data to the data stream
+		blob_data_as_file_stream::$blob_data_stream = $ImgData;
+		
+		//Run getimagesize() on the data stream
+		$image_size = getimagesize('BlobDataAsFileStream://');
+		
+		stream_wrapper_unregister("BlobDataAsFileStream");
+		
+		$ImgDataURL = 'data:' . $image_size['mime'] . ';base64,' . base64_encode($ImgData);
+		return $ImgDataURL;
 	}
 	
     public function formulation_and_controls(question_attempt $qa, question_display_options $options) {
@@ -185,7 +202,7 @@ class qtype_canvas_renderer extends qtype_renderer {
 			$inputattributes['size'] = round(strlen($placeholder) * 1.1);
 		}
 
-        $bgimageArray = self::get_url_for_image($qa, 'qtype_canvas_image_file');
+        $bgimageArray = self::get_image_for_question($qa->get_question());
         
         $canvas = "<div class=\"qtype_canvas_id_" . $question->id . "\">";
         if ($options->correctness) {
@@ -265,35 +282,25 @@ class qtype_canvas_renderer extends qtype_renderer {
 
 
 
-    public static function get_url_for_image(question_attempt $qa, $filearea, $itemid = 0) {
-    	global $CFG;
-    	$question = $qa->get_question();
-
-
-    	$qubaid = $qa->get_usage_id();
-    	$slot = $qa->get_slot();
-
-
-
+    public static function get_image_for_question($question) {
     	$fs = get_file_storage();
-    	$componentname = $question->qtype->plugin_name();
-    	$draftfiles = $fs->get_area_files($question->contextid, $componentname, $filearea, $question->id, 'id');
+    	$draftfiles = $fs->get_area_files($question->contextid,  $question->qtype->plugin_name(), 'qtype_canvas_image_file', $question->id, 'id');
     	if ($draftfiles) {
     		foreach ($draftfiles as $file) {
     			if ($file->is_directory()) {
     				continue;
     			}
-    			$url = moodle_url::make_pluginfile_url($question->contextid, $componentname, $filearea, "$qubaid/$slot/$question->id", '/', $file->get_filename());
-    			//$url = moodle_url::make_pluginfile_url($question->contextid, $componentname, $filearea, "29/1/$question->id", '/', $file->get_filename());
-    			//$url = moodle_url::make_pluginfile_url($file->get_contextid(), $file->get_component(), $file->get_filearea(), null, $file->get_filepath(), $file->get_filename());
-    			//$url = $CFG->wwwroot . '/pluginfile.php/' . $file->get_contextid() . '/' . $file->get_component(). '/' . $file->get_filearea() . '/arbitrary/extra/infomation.ext';
-    			//$url = "{$CFG->wwwroot}/pluginfile.php/{$file->get_contextid()}/qtype_canvas}";
-    			//$url .= $file->get_filepath().$file->get_itemid().'/'.$filename;
-    			
+    			// Prefer to send dataURL instead of mess with the plugin file API which turned out to be quite cumbersome. Anyway this should really speed things up for the browser
+    			// as it reduces HTTP requests.
+    			// ----------
+    			//$url = moodle_url::make_pluginfile_url($question->contextid, $componentname, $filearea, "$qubaid/$slot/$question->id", '/', $file->get_filename()); 			
+    			// ----------
     			$image = imagecreatefromstring($file->get_content());
     			$width = imagesx($image);
     			$height = imagesy($image);
-    			return array($url->out(), $width, $height);
+    			$ImgDataURL = self::toDataURL_from_gdImage($image);
+    			imagedestroy($image);
+    			return array($ImgDataURL, $width, $height);
     		}
     	}
     	return null;
@@ -303,6 +310,132 @@ class qtype_canvas_renderer extends qtype_renderer {
 
 
 
+}
 
+
+
+
+
+
+
+
+
+
+
+// Take from http://php.net/manual/en/function.getimagesize.php
+// Because I couldn't find a way to apply imagegetsize() on a raw blob of data
+// instead of a filename. imagegetsize() is necessary to obtain the MIME
+// type of the image.
+
+
+// Le'ts hope this doesn't create too much overhead.
+
+/*
+ ----------------------------------------------------------------------
+PHP Blob Data As File Stream v1.0 (C) 2012 Alex Yam <alexyam@live.com>
+This code is released under the MIT License.
+----------------------------------------------------------------------
+[Summary]
+
+A simple class for PHP functions to read and write blob data as a file
+using a stream wrapper.
+
+Particularly useful for running getimagesize() to get the width and
+height of .SWF Flash files that are stored in the database as blob data.
+
+Tested on PHP 5.3.10.
+
+----------------------------------------------------------------------
+[Usage Example]
+
+//Include
+include('./blob_data_as_file_stream.php');
+
+//Register the stream wrapper
+stream_wrapper_register("BlobDataAsFileStream", "blob_data_as_file_stream");
+
+//Fetch a .SWF file from the Adobe website and store it into a variable.
+//Replace this with your own fetch-swf-blob-data-from-database code.
+$swf_url = 'http://www.adobe.com/swf/software/flash/about/flashAbout_info_small.swf';
+$swf_blob_data = file_get_contents($swf_url);
+
+//Store $swf_blob_data to the data stream
+blob_data_as_file_stream::$blob_data_stream = $swf_blob_data;
+
+//Run getimagesize() on the data stream
+$swf_info = getimagesize('BlobDataAsFileStream://');
+var_dump($swf_info);
+
+----------------------------------------------------------------------
+[Usage Output]
+
+array(5) {
+[0]=>
+int(159)
+[1]=>
+int(91)
+[2]=>
+int(13)
+[3]=>
+string(23) "width="159" height="91""
+["mime"]=>
+string(29) "application/x-shockwave-flash"
+}
+
+*/
+
+class blob_data_as_file_stream {
+
+	private static $blob_data_position = 0;
+	public static $blob_data_stream = '';
+
+	public static function stream_open($path,$mode,$options,&$opened_path){
+		static::$blob_data_position = 0;
+		return true;
+	}
+
+	public static function stream_seek($seek_offset,$seek_whence){
+		$blob_data_length = strlen(static::$blob_data_stream);
+		switch ($seek_whence) {
+			case SEEK_SET:
+				$new_blob_data_position = $seek_offset;
+				break;
+			case SEEK_CUR:
+				$new_blob_data_position = static::$blob_data_position+$seek_offset;
+				break;
+			case SEEK_END:
+				$new_blob_data_position = $blob_data_length+$seek_offset;
+				break;
+			default:
+				return false;
+		}
+		if (($new_blob_data_position >= 0) AND ($new_blob_data_position <= $blob_data_length)){
+			static::$blob_data_position = $new_blob_data_position;
+			return true;
+		}else{
+			return false;
+		}
+	}
+
+	public static function stream_tell(){
+		return static::$blob_data_position;
+	}
+
+	public static function stream_read($read_buffer_size){
+		$read_data = substr(static::$blob_data_stream,static::$blob_data_position,$read_buffer_size);
+		static::$blob_data_position += strlen($read_data);
+		return $read_data;
+	}
+
+	public static function stream_write($write_data){
+		$write_data_length=strlen($write_data);
+		static::$blob_data_stream = substr(static::$blob_data_stream,0,static::$blob_data_position).
+		$write_data.substr(static::$blob_data_stream,static::$blob_data_position+=$write_data_length);
+		return $write_data_length;
+	}
+
+	public static function stream_eof(){
+		return static::$blob_data_position >= strlen(static::$blob_data_stream);
+	}
 
 }
