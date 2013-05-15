@@ -135,7 +135,6 @@ class qtype_canvas extends question_type {
 
     }
     
-    
 
     protected function initialise_question_instance(question_definition $question, $questiondata) {
         parent::initialise_question_instance($question, $questiondata);

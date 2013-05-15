@@ -40,3 +40,5 @@ $string['notenoughanswers'] = 'This type of question requires at least {$a} answ
 $string['pleaseenterananswer'] = 'Please enter an answer.';
 $string['drawing_parameters'] = 'Drawing Parameters';
 $string['introtext'] = 'Your Drawing Raw Data';
+$string['backgroundfilemustbegiven'] = 'You must specify a file as a background image for the canvas';
+$string['drawingmustbegiven'] = 'You must make a drawing';
