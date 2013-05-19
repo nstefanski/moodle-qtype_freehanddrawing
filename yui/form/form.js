@@ -13,6 +13,7 @@ YUI.add('moodle-qtype_canvas-form', function(Y) {
 			CHOOSEFILEBUTTON: 'input[name="qtype_canvas_image_filechoose"]',
 			ERASERBUTTON: 'img[class="qtype_canvas_eraser"]',
 			CONTAINERDIV: 'div[class="qtype_canvas_container_div"]',
+			NOBACKGROUNDIMAGESELECTEDYET: 'div[class="qtype_canvas_no_background_image_selected_yet"]',
 	};
 	Y.namespace('Moodle.qtype_canvas.form');
 
@@ -144,16 +145,10 @@ YUI.add('moodle-qtype_canvas-form', function(Y) {
 		var image = new Image();
 		image.src = imgURL;
 		image.onload = function () {
-			Y.one(SELECTORS.GENERICCANVAS).setStyles({
-				backgroundImage: "url('" + imgURL + "')",
-				display: 'block'
-			});
-			Y.one(SELECTORS.ERASERBUTTON).setStyles({
-				display: 'block'
-			});
-			Y.one(SELECTORS.CONTAINERDIV).setStyles({
-				display: 'inline-block'
-			});
+			Y.one(SELECTORS.GENERICCANVAS).setStyles({backgroundImage: "url('" + imgURL + "')", display: 'block'});
+			Y.one(SELECTORS.ERASERBUTTON).setStyles({display: 'block'});
+			Y.one(SELECTORS.CONTAINERDIV).setStyles({display: 'inline-block'});
+			Y.one(SELECTORS.NOBACKGROUNDIMAGESELECTEDYET).setStyles({display: 'none'});
 			
 			
 			Y.one(SELECTORS.GENERICCANVAS).getDOMNode().width = image.width;

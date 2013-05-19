@@ -36,27 +36,56 @@ require_once (dirname(__FILE__) . '/renderer.php');
 class qtype_canvas_edit_form extends question_edit_form {
 
     protected function definition_inner($mform) {
-        global $PAGE, $CFG;
+        global $PAGE, $CFG, $USER;
         
         
-        if (array_key_exists('id', $this->question) === true) {
-        	$question = $this->question;
-        	if (array_key_exists('contextid', $question) === false || array_key_exists('answers', $question) === false) {
-        		$question = question_bank::load_question($question->id, false);
-        	}
-        	// Question already exists! We are in edit mode.
-        	$bgimageArray = qtype_canvas_renderer::get_image_for_question($question);
-        	$canvasHTMLParams = "width=\"".$bgimageArray[1]."\" height=\"".$bgimageArray[2]."\"style=\"background:url('$bgimageArray[0]')\"";
-        	
-        	$eraserHTMLParams = '';
-        	
-        	$canvasTextAreaPreexistingAnswer = reset($question->answers)->answer;
-        
+        $usercontext = context_user::instance($USER->id);
+        $bgImageArray = null;
+        $canvasTextAreaPreexistingAnswer = '';
+        $noBackgroundImageSelectedYetStyle = '';
+        $eraserHTMLParams = '';
+
+       	$bgImageArray = qtype_canvas_renderer::get_image_for_files($usercontext->id, 'user', 'draft',  file_get_submitted_draft_itemid('qtype_canvas_image_file'));
+        if ($bgImageArray !== null) {
+        	$canvasHTMLParams = "width=\"".$bgImageArray[1]."\" height=\"".$bgImageArray[2]."\"style=\"background:url('$bgImageArray[0]')\"";
+        	$noBackgroundImageSelectedYetStyle = 'style="display: none;"';
         } else {
-        	$canvasHTMLParams = 'style="display: none;"';
-        	$eraserHTMLParams = 'style="display: none;"';
-        	$canvasTextAreaPreexistingAnswer = '';
+        	if (array_key_exists('id', $this->question) === true) {
+        		$question = $this->question;
+        		if (array_key_exists('contextid', $question) === false || array_key_exists('answers', $question) === false) {
+        			$question = question_bank::load_question($question->id, false);
+        		}
+        		// Question already exists! We are in edit mode.
+        		$bgImageArray = qtype_canvas_renderer::get_image_for_question($question);
+        		$canvasHTMLParams = "width=\"".$bgImageArray[1]."\" height=\"".$bgImageArray[2]."\"style=\"background:url('$bgImageArray[0]')\"";
+        		
+        		$noBackgroundImageSelectedYetStyle = 'style="display: none;"';
+        		 
+        		$canvasTextAreaPreexistingAnswer = reset($question->answers)->answer;
+        		
+        		
+        		
+        		
+        		// Tried to implement this:  http://docs.moodle.org/dev/Using_the_File_API_in_Moodle_forms#Load_existing_files_into_draft_area
+//   				// $bgImageArray[3] will contain the $file->get_itemid() so that we can load it up for the UI in the form.
+        		$entry = new stdClass;
+        		$entry->id = null;
+        		file_prepare_draft_area($bgImageArray[3], $question->contextid, 'qtype_canvas', 'qtype_canvas_image_file', $question->id, array('maxbytes' => 1572864/*1.5MB*/, 'accepted_types' => array('image', 'picture')));
+        		$entry->attachments = $bgImageArray[3];
+        		
+        		
+        		
+        		//$mform->set_data($entry); //<-- for some reason this doesn't exist even though it's in the DOCS! seems to work only for moodleforms:: and not for QuickForm?
+        		
+        	
+        	
+        	} else {
+        		$canvasHTMLParams = 'style="display: none;"';
+        		$eraserHTMLParams = 'style="display: none;"';
+        	}	
         }
+        
+        
         
         
         $mform->addElement('header', 'qtype_canvas_drawing_parameters', get_string('drawing_parameters', 'qtype_canvas'));
@@ -87,15 +116,18 @@ class qtype_canvas_edit_form extends question_edit_form {
                 9 => 95,
                 10 => 100));
  
-        $mform->addElement('textarea', 'qtype_canvas_textarea_id_0', get_string("introtext", "qtype_canvas"), 'class="qtype_canvas_textarea" wrap="virtual" rows="20" cols="50"');
-        $mform->setDefault('qtype_canvas_textarea_id_0', $canvasTextAreaPreexistingAnswer);
+
         // TODO: Implement this: http://docs.moodle.org/dev/Using_the_File_API_in_Moodle_forms#Load_existing_files_into_draft_area
         $mform->addElement('filepicker', 'qtype_canvas_image_file', get_string('file'), null,
                            array('maxbytes' => 1572864/*1.5MB*/, 'accepted_types' => array('image', 'picture')));
         $mform->closeHeaderBefore('drawsolution');
         //$mform->addElement('html', '<img ALT="Erase Canvas" SRC="'.$CFG->wwwroot . '/question/type/canvas/pix/Eraser-icon.png" CLASS="qtype_canvas_eraser" ID="qtype_canvas_eraser_id_0" '.$eraserHTMLParams.'>');
-        $mform->addElement('input', 'input_before_drawing', get_string("introtext", "qtype_canvas"), 'class="input_before_drawing"');
-        $mform->addElement('html', '<div class="qtype_canvas_container_div" '.$eraserHTMLParams.'><img ALT="Erase Canvas" SRC="'.$CFG->wwwroot . '/question/type/canvas/pix/Eraser-icon.png" CLASS="qtype_canvas_eraser" ID="qtype_canvas_eraser_id_0" '.$eraserHTMLParams.'><canvas class="qtype_canvas" '.$canvasHTMLParams.'>');
+        $mform->addElement('textarea', 'qtype_canvas_textarea_id_0', get_string("drawingrawdata", "qtype_canvas"), 'class="qtype_canvas_textarea" wrap="virtual" rows="20" cols="50"');
+        $mform->setDefault('qtype_canvas_textarea_id_0', $canvasTextAreaPreexistingAnswer);
+        $mform->addElement('html', '<div class="fitem"><div class="fitemtitle">' . 
+        		get_string("drawanswer", "qtype_canvas").'</div><div class="felement"><div class="qtype_canvas_no_background_image_selected_yet" '.$noBackgroundImageSelectedYetStyle.'>' . 
+        		get_string('nobackgroundimageselectedyet', 'qtype_canvas') . 
+        		'</div><div class="qtype_canvas_container_div" '.$eraserHTMLParams.'><img ALT="Erase Canvas" SRC="'.$CFG->wwwroot . '/question/type/canvas/pix/Eraser-icon.png" CLASS="qtype_canvas_eraser" ID="qtype_canvas_eraser_id_0" '.$eraserHTMLParams.'><canvas class="qtype_canvas" '.$canvasHTMLParams.'>');
         //$this->add_per_answer_fields($mform, get_string('answerno', 'qtype_canvas', '{no}'), question_bank::fraction_options());
 
         $this->add_interactive_settings();
@@ -114,6 +146,30 @@ class qtype_canvas_edit_form extends question_edit_form {
         $question = $this->data_preprocessing_answers($question);
         $question = $this->data_preprocessing_hints($question);
         $this->js_call();
+        
+        
+//         if (array_key_exists('id', $this->question) === true) {
+//         	$question = $this->question;
+//         	if (array_key_exists('contextid', $question) === false || array_key_exists('answers', $question) === false) {
+//         		$question = question_bank::load_question($question->id, false);
+//         	}
+//         	// Question already exists! We are in edit mode.
+//         	$bgImageArray = qtype_canvas_renderer::get_image_for_question($question);
+        
+//         	// Tried to implement this:  http://docs.moodle.org/dev/Using_the_File_API_in_Moodle_forms#Load_existing_files_into_draft_area
+//         	//   				// $bgImageArray[3] will contain the $file->get_itemid() so that we can load it up for the UI in the form.
+//         	//$entry = new stdClass;
+//         	//$entry->id = null;
+//         	//file_prepare_draft_area($bgImageArray[3], $question->contextid, 'qtype_canvas', 'qtype_canvas_image_file', $question->id, array('maxbytes' => 1572864/*1.5MB*/, 'accepted_types' => array('image', 'picture')));
+//         	//$question->qtype_canvas_image_files =  $bgImageArray[3];
+       
+        
+        	 
+        	 
+//         }
+        
+        
+        
         return $question;
     }
 
@@ -126,8 +182,9 @@ class qtype_canvas_edit_form extends question_edit_form {
         
         // Check that there is _any_ bg-image
         // Step 1: Prefer files given in this current form over pre-existing files (since if both exist, the new files will be the ones that get saved).
+       
         $fs = get_file_storage();
-        $usercontext = get_context_instance(CONTEXT_USER, $USER->id);
+        $usercontext = context_user::instance($USER->id);
         $draftfiles = $fs->get_area_files($usercontext->id, 'user', 'draft', $data['qtype_canvas_image_file'], 'id');
         if (count($draftfiles) < 2) {
         	// No files given in the form, check if they maybe pre-exist:

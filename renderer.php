@@ -289,9 +289,12 @@ class qtype_canvas_renderer extends qtype_renderer {
 
 
     public static function get_image_for_question($question) {
+    	return self::get_image_for_files($question->contextid,  'qtype_canvas', 'qtype_canvas_image_file', $question->id);
+    }
+    
+    public static function get_image_for_files($context, $component, $filearea, $itemid) {
     	$fs = get_file_storage();
-    	
-    	$draftfiles = $fs->get_area_files($question->contextid,  'qtype_canvas', 'qtype_canvas_image_file', $question->id, 'id');
+    	$draftfiles = $fs->get_area_files($context,  $component, $filearea, $itemid, 'id');
     	if ($draftfiles) {
     		foreach ($draftfiles as $file) {
     			if ($file->is_directory()) {
@@ -300,14 +303,14 @@ class qtype_canvas_renderer extends qtype_renderer {
     			// Prefer to send dataURL instead of mess with the plugin file API which turned out to be quite cumbersome. Anyway this should really speed things up for the browser
     			// as it reduces HTTP requests.
     			// ----------
-    			//$url = moodle_url::make_pluginfile_url($question->contextid, $componentname, $filearea, "$qubaid/$slot/$question->id", '/', $file->get_filename()); 			
+    			//$url = moodle_url::make_pluginfile_url($question->contextid, $componentname, $filearea, "$qubaid/$slot/$question->id", '/', $file->get_filename());
     			// ----------
     			$image = imagecreatefromstring($file->get_content());
     			$width = imagesx($image);
     			$height = imagesy($image);
     			$ImgDataURL = self::toDataURL_from_gdImage($image);
     			imagedestroy($image);
-    			return array($ImgDataURL, $width, $height);
+    			return array($ImgDataURL, $width, $height, $file->get_itemid());
     		}
     	}
     	return null;

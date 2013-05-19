@@ -123,7 +123,7 @@ class qtype_canvas extends question_type {
         $answer->id = $DB->insert_record('question_answers', $answer);
         
         $fs = get_file_storage();
-        $usercontext = get_context_instance(CONTEXT_USER, $USER->id);
+        $usercontext = context_user::instance($USER->id);
         $draftfiles = $fs->get_area_files($usercontext->id, 'user', 'draft', $question->qtype_canvas_image_file, 'id');
         //$oldfiles   = $fs->get_area_files($contextid, $component, $filearea, $itemid, 'id');
         if (count($draftfiles) >= 2) {
