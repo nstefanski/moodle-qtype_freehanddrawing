@@ -56,6 +56,14 @@ class qtype_canvas_edit_form extends question_edit_form {
         			$question = question_bank::load_question($question->id, false);
         		}
         		// Question already exists! We are in edit mode.
+        		
+        		// --------------------------------------------------------
+        		// This is in case duplicates are request to be made:
+        		$mform->addElement('hidden', 'pre_existing_question_id', $question->id);
+        		// --------------------------------------------------------
+        		
+        		
+        		
         		$bgImageArray = qtype_canvas_renderer::get_image_for_question($question);
         		$canvasHTMLParams = "width=\"".$bgImageArray[1]."\" height=\"".$bgImageArray[2]."\"style=\"background:url('$bgImageArray[0]')\"";
         		
@@ -120,7 +128,8 @@ class qtype_canvas_edit_form extends question_edit_form {
         // TODO: Implement this: http://docs.moodle.org/dev/Using_the_File_API_in_Moodle_forms#Load_existing_files_into_draft_area
         $mform->addElement('filepicker', 'qtype_canvas_image_file', get_string('file'), null,
                            array('maxbytes' => 1572864/*1.5MB*/, 'accepted_types' => array('image', 'picture')));
-        $mform->closeHeaderBefore('drawsolution');
+        $mform->addElement('header', 'qtype_canvas_drawing', get_string('drawing', 'qtype_canvas'));
+        //$mform->closeHeaderBefore('drawsolution');
         //$mform->addElement('html', '<img ALT="Erase Canvas" SRC="'.$CFG->wwwroot . '/question/type/canvas/pix/Eraser-icon.png" CLASS="qtype_canvas_eraser" ID="qtype_canvas_eraser_id_0" '.$eraserHTMLParams.'>');
         $mform->addElement('textarea', 'qtype_canvas_textarea_id_0', get_string("drawingrawdata", "qtype_canvas"), 'class="qtype_canvas_textarea" wrap="virtual" rows="20" cols="50"');
         $mform->setDefault('qtype_canvas_textarea_id_0', $canvasTextAreaPreexistingAnswer);

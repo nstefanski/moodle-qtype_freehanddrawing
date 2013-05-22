@@ -305,6 +305,9 @@ class qtype_canvas_renderer extends qtype_renderer {
     			// ----------
     			//$url = moodle_url::make_pluginfile_url($question->contextid, $componentname, $filearea, "$qubaid/$slot/$question->id", '/', $file->get_filename());
     			// ----------
+    			if ($file->get_content() == null) {
+    				return null;
+    			}
     			$image = imagecreatefromstring($file->get_content());
     			$width = imagesx($image);
     			$height = imagesy($image);

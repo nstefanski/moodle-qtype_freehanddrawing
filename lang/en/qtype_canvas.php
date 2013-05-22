@@ -43,4 +43,5 @@ $string['drawingrawdata'] = '';
 $string['backgroundfilemustbegiven'] = 'You must specify a file as a background image for the canvas.';
 $string['drawingmustbegiven'] = 'You must make a drawing.';
 $string['drawanswer'] = 'Draw answer';
+$string['drawing'] = 'Drawing';
 $string['nobackgroundimageselectedyet'] = 'No background image selected yet.';

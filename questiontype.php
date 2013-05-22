@@ -62,73 +62,110 @@ class qtype_canvas extends question_type {
 
         $context = $question->context;
 
-        $oldanswers = $DB->get_records('question_answers',
-                array('question' => $question->id), 'id ASC');
+        $oldanswers = $DB->get_records('question_answers', array('question' => $question->id), 'id ASC');
 
-        $answers = array();
-        $maxfraction = -1;
+        //$answers = array();
+        //$maxfraction = -1;
 
-        // Insert all the new answers
-        if (array_key_exists('answer', $question)) {
-        	foreach ($question->answer as $key => $answerdata) {
-        		// Check for, and ignore, completely blank answer from the form.
-        		if (trim($answerdata) == '' && $question->fraction[$key] == 0 &&
-        		html_is_blank($question->feedback[$key]['text'])) {
-        			continue;
-        		}
+//         // Insert all the new answers
+//         if (array_key_exists('answer', $question)) {
+//         	foreach ($question->answer as $key => $answerdata) {
+//         		// Check for, and ignore, completely blank answer from the form.
+//         		if (trim($answerdata) == '' && $question->fraction[$key] == 0 &&
+//         		html_is_blank($question->feedback[$key]['text'])) {
+//         			continue;
+//         		}
 
-        		// Update an existing answer if possible.
-        		$answer = array_shift($oldanswers);
-        		if (!$answer) {
-        			$answer = new stdClass();
-        			$answer->question = $question->id;
-        			$answer->answer = '';
-        			$answer->feedback = '';
-        			$answer->id = $DB->insert_record('question_answers', $answer);
-        		}
+//         		// Update an existing answer if possible.
+//         		$answer = array_shift($oldanswers);
+//         		if (!$answer) {
+//         			$answer = new stdClass();
+//         			$answer->question = $question->id;
+//         			$answer->answer = '';
+//         			$answer->feedback = '';
+//         			$answer->id = $DB->insert_record('question_answers', $answer);
+//         		}
 
-        		$answer->answer   = trim($answerdata);
-        		$answer->fraction = $question->fraction[$key];
-        		$answer->feedback = $this->import_or_save_files($question->feedback[$key],
-        				$context, 'question', 'answerfeedback', $answer->id);
-        		$answer->feedbackformat = $question->feedback[$key]['format'];
-        		$DB->update_record('question_answers', $answer);
+//         		$answer->answer   = trim($answerdata);
+//         		$answer->fraction = $question->fraction[$key];
+//         		$answer->feedback = $this->import_or_save_files($question->feedback[$key],
+//         				$context, 'question', 'answerfeedback', $answer->id);
+//         		$answer->feedbackformat = $question->feedback[$key]['format'];
+//         		$DB->update_record('question_answers', $answer);
 
-        		$answers[] = $answer->id;
-        		if ($question->fraction[$key] > $maxfraction) {
-        			$maxfraction = $question->fraction[$key];
-        		}
-        	}
-        }
+//         		$answers[] = $answer->id;
+//         		if ($question->fraction[$key] > $maxfraction) {
+//         			$maxfraction = $question->fraction[$key];
+//         		}
+//         	}
+//         }
 
-        $question->answers = implode(',', $answers);
+        
+        
+//			$question->answers = implode(',', $answers);
+        
+        
         $parentresult = parent::save_question_options($question);
         if ($parentresult !== null) {
             // Parent function returns null if all is OK
             return $parentresult;
         }
 
+        
+        $this->save_hints($question);
+        
         // Delete any left over old answer records.
        
         foreach ($oldanswers as $oldanswer) {
             $DB->delete_records('question_answers', array('id' => $oldanswer->id));
         }
 
-        $this->save_hints($question);
-
+     
+		// Save the new answer:
         $answer = new stdClass();
         $answer->question = $question->id;
         $answer->answer = $question->qtype_canvas_textarea_id_0;
         $answer->feedback = '';
         $answer->id = $DB->insert_record('question_answers', $answer);
         
+        // Save the background image:
+        
         $fs = get_file_storage();
         $usercontext = context_user::instance($USER->id);
         $draftfiles = $fs->get_area_files($usercontext->id, 'user', 'draft', $question->qtype_canvas_image_file, 'id');
-        //$oldfiles   = $fs->get_area_files($contextid, $component, $filearea, $itemid, 'id');
         if (count($draftfiles) >= 2) {
         	$fs->delete_area_files( $question->context->id, 'qtype_canvas', 'qtype_canvas_image_file', $question->id);
         	file_save_draft_area_files($question->qtype_canvas_image_file, $question->context->id, 'qtype_canvas', 'qtype_canvas_image_file', $question->id, array('subdirs' => 0, 'maxbytes' => 0, 'maxfiles' => 1));
+        } else {
+        	// No files have been indicated to be uploaded. Check if this is an attempt to make a duplicate copy of this question: 
+        	if (property_exists($question, 'pre_existing_question_id') && $question->pre_existing_question_id != 0) {
+        		// Yes, this was an edit form which turned out to be a "Make copy", so we need to copy over the background image of the old question into a new record:
+        		// First fetch the old one:
+        		$oldfiles   = $fs->get_area_files($question->context->id, 'qtype_canvas', 'qtype_canvas_image_file', $question->pre_existing_question_id, 'id');
+        		if (count($oldfiles) >= 2) {
+        			// Files indeed exist.
+        			foreach ($oldfiles as $oldfile) {
+        				if ($oldfile->is_directory()) {
+        					continue;
+        				}
+        				$newfile = array(
+        						'contextid' => $question->context->id, // ID of context
+        						'component' => 'qtype_canvas',     // usually = table name
+        						'filearea' => 'qtype_canvas_image_file',     // usually = table name
+        						'itemid' => $question->id,               // usually = ID of row in table
+        						'filepath' => '/',           // any path beginning and ending in /
+        						'filename' => $oldfile->get_filename()); // any filename
+        				$fs->create_file_from_storedfile($newfile, $oldfile);
+        				continue;
+        			}
+        		} else {
+        			// An older question exists but it has no files--what??
+        			return -1;
+        		}
+        	} else {
+        		// Something's fishy...
+        		return -1;
+        	}
         }
 
 
