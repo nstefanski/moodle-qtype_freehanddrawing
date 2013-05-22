@@ -75,7 +75,7 @@ class qtype_canvas_edit_form extends question_edit_form {
         		
         		
         		
-        		//$mform->set_data($entry); //<-- for some reason this doesn't exist even though it's in the DOCS! seems to work only for moodleforms:: and not for QuickForm?
+        		//$this->$mform->set_data($entry); //<-- for some reason this doesn't exist even though it's in the DOCS! seems to work only for moodleforms:: and not for QuickForm?
         		
         	
         	
