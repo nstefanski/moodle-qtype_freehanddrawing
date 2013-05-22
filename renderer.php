@@ -44,74 +44,98 @@ class qtype_canvas_renderer extends qtype_renderer {
 		return $pos;
 	}
 
+	private static function create_gd_image_from_string($imgString) {
+		if ($imgString != '') {
+			$imgData = base64_decode(self::strstr_after($imgString, 'base64,'));
+			$img =  imagecreatefromstring($imgData);
+			imagealphablending( $img, false );
+			imagesavealpha( $img, true );
+			return $img;
+		}
+	}
+	
 	public static function compare_drawings($teacherAnswer, $studentAnswer, $createBlendedImg = false) {
 
 	//	ini_set('memory_limit', '-1');
 		
 		// Beginning of dataURL string: "data:image/png;base64,"
 		
-		$correctAnswerData = base64_decode(self::strstr_after($teacherAnswer, 'base64,'));
-		$currentAnswerData = base64_decode(self::strstr_after($studentAnswer , 'base64,'));
-			
-		$correctAnswerImg =  imagecreatefromstring($correctAnswerData);
-		$currentAnswerImg =  imagecreatefromstring($currentAnswerData);
-
-		imagealphablending( $correctAnswerImg, false );
-		imagesavealpha( $correctAnswerImg, true );
-			
-		imagealphablending( $currentAnswerImg, false );
-		imagesavealpha( $currentAnswerImg, true );
+		$onlyShowCorrectAnswer = true;
+		
+		if ($studentAnswer != '') {
+			// no answer given by student--that's fine, we can still show the right answer.
+			$onlyShowCorrectAnswer = false;
+			$currentAnswerImg = self::create_gd_image_from_string($studentAnswer);			
+		}
+		
+		$correctAnswerImg = self::create_gd_image_from_string($teacherAnswer);
 		
 		$width = imagesx($correctAnswerImg);
 		$height = imagesy($correctAnswerImg);
 		
 		if ($createBlendedImg ===  true) {
-			$blendedImg = imagecreatefromstring($currentAnswerData);
-			imagealphablending( $blendedImg, false );
-			imagesavealpha( $blendedImg, true );
+			// Create a copy just to have somewhere to write to. It doesn't matter that the $teacherAnswer is not blank
+			// we don't need blank, since in fact more pixels than the ones in the teacher answer picture are going to be drawn into.
+			$blendedImg = self::create_gd_image_from_string($teacherAnswer);
 			$green = imagecolorallocate($blendedImg, 0, 255, 0);
 			$blue = imagecolorallocate($blendedImg, 0, 0, 255);
 			$red = imagecolorallocate($blendedImg, 255, 0, 0);
 		}
 			
 		$matchingPixels = 0;
+		$matchPercentage = 0;
 		$teacherOnlyPixels = 0;
 		$studentOnlyPixels = 0;
+		
 		for ($x = 0; $x < $width; $x++) {
 			for ($y = 0; $y < $height; $y++) {
 				$rgbCorrectAns = imagecolorat($correctAnswerImg, $x, $y);
-				$rgbCurrentAns = imagecolorat($currentAnswerImg, $x, $y);
 				$rgbCorrectAnsArray = array(($rgbCorrectAns >> 16) & 0xFF, ($rgbCorrectAns >> 8) & 0xFF, $rgbCorrectAns & 0xFF);
-				$rgbCurrentAnsArray = array(($rgbCurrentAns >> 16) & 0xFF, ($rgbCurrentAns >> 8) & 0xFF, $rgbCurrentAns & 0xFF);
-				if ($rgbCorrectAnsArray[2] == 255 && $rgbCurrentAnsArray[2] == 255) {
-					$matchingPixels++;
-					if ($createBlendedImg ===  true) {
-						imagesetpixel($blendedImg, $x, $y, $green);
+				if (!$onlyShowCorrectAnswer) {
+					// VALIDATE STUDENT ANSWER
+					$rgbCurrentAns = imagecolorat($currentAnswerImg, $x, $y);
+					$rgbCurrentAnsArray = array(($rgbCurrentAns >> 16) & 0xFF, ($rgbCurrentAns >> 8) & 0xFF, $rgbCurrentAns & 0xFF);
+					if ($rgbCorrectAnsArray[2] == 255 && $rgbCurrentAnsArray[2] == 255) {
+						$matchingPixels++;
+						if ($createBlendedImg ===  true) {
+							imagesetpixel($blendedImg, $x, $y, $green);
+						}
+					} else if ($rgbCorrectAnsArray[2] == 255 && $rgbCurrentAnsArray[2] == 0) {
+						$teacherOnlyPixels++;
+						if ($createBlendedImg ===  true) {
+							imagesetpixel($blendedImg, $x, $y, $blue);
+						}
+					} else if ($rgbCorrectAnsArray[2] == 0 && $rgbCurrentAnsArray[2] == 255) {
+						$studentOnlyPixels++;
+						if ($createBlendedImg ===  true) {
+							imagesetpixel($blendedImg, $x, $y, $red);
+						}
 					}
-				} else if ($rgbCorrectAnsArray[2] == 255 && $rgbCurrentAnsArray[2] == 0) {
-					$teacherOnlyPixels++;
-					if ($createBlendedImg ===  true) {
-						imagesetpixel($blendedImg, $x, $y, $blue);
-					}
-				} else if ($rgbCorrectAnsArray[2] == 0 && $rgbCurrentAnsArray[2] == 255) {
-					$studentOnlyPixels++;
-					if ($createBlendedImg ===  true) {
-						imagesetpixel($blendedImg, $x, $y, $red);
+				} else {
+					// ONLY SHOW CORRECT ANSWER -- NO INPUT FROM USER
+					 if ($rgbCorrectAnsArray[2] == 255) {
+						$teacherOnlyPixels++;
+						if ($createBlendedImg ===  true) {
+							imagesetpixel($blendedImg, $x, $y, $blue);
+						}
 					}
 				}
 			}
 		}
 		
 		imagedestroy($correctAnswerImg);
-		imagedestroy($currentAnswerImg);
 		
-		$matchPercentage = ($matchingPixels / ($matchingPixels + $teacherOnlyPixels + $studentOnlyPixels))*100;
+		if (!$onlyShowCorrectAnswer) {
+			imagedestroy($currentAnswerImg);
+			$matchPercentage = ($matchingPixels / ($matchingPixels + $teacherOnlyPixels + $studentOnlyPixels))*100;
+		}
 		
 		if ($createBlendedImg ===  true) {
 			$blendedImgDataURL = self::toDataURL_from_gdImage($blendedImg);
 			imagedestroy($blendedImg);
 			return array($blendedImgDataURL, $matchPercentage);
 		}
+		
 		return $matchPercentage;
 	}
 	

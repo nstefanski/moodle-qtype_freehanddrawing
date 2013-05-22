@@ -58,7 +58,7 @@ class qtype_canvas_edit_form extends question_edit_form {
         		// Question already exists! We are in edit mode.
         		
         		// --------------------------------------------------------
-        		// This is in case duplicates are request to be made:
+        		// This is in case duplicates are requested to be made:
         		$mform->addElement('hidden', 'pre_existing_question_id', $question->id);
         		// --------------------------------------------------------
         		
