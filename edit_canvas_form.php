@@ -19,20 +19,14 @@
  *
  * @package    qtype
  * @subpackage canvas
- * @copyright  2012 Martin Vögeli (Voma) {@link http://moodle.ch/}, based on 2007 Jamie Pratt
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  Jacob Shapiro <jacob.shapiro@let.ethz.ch>
+ * @license    http://opensource.org/licenses/BSD-3-Clause
  */
 
 defined('MOODLE_INTERNAL') || die();
 
 require_once (dirname(__FILE__) . '/renderer.php');
 
-/**
- * Short canvas question editing form definition.
- *
- * @copyright  2012 Martin Vögeli (Voma), based on 2007 Jamie Pratt
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
 class qtype_canvas_edit_form extends question_edit_form {
 
     protected function definition_inner($mform) {

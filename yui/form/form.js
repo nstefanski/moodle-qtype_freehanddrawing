@@ -1,9 +1,8 @@
 /**
- * This is the question form code.
+ * This is JavaScript code that handles drawing on mouse events and painting pre-existing drawings.
  */
 
 YUI.add('moodle-qtype_canvas-form', function(Y) {
-	// Define a name space to call
 	var CSS = {
 	},
 	SELECTORS = {

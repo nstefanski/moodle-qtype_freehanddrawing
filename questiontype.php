@@ -15,12 +15,12 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Question type class for the short answer question type.
+ * Question type class for the canvas question type.
  *
  * @package    qtype
  * @subpackage canvas
- * @copyright  1999 onwards Martin Dougiamas  {@link http://moodle.com}
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  Jacob Shapiro <jacob.shapiro@let.ethz.ch>
+ * @license    http://opensource.org/licenses/BSD-3-Clause
  */
 
 
@@ -32,10 +32,10 @@ require_once($CFG->dirroot . '/question/type/canvas/question.php');
 
 
 /**
- * The short answer question type.
+ * The canvas question type.
  *
- * @copyright  1999 onwards Martin Dougiamas  {@link http://moodle.com}
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  Jacob Shapiro <jacob.shapiro@let.ethz.ch> 
+ * @license    http://opensource.org/licenses/BSD-3-Clause
  */
 class qtype_canvas extends question_type {
     public function extra_question_fields() {
@@ -138,7 +138,7 @@ class qtype_canvas extends question_type {
         	file_save_draft_area_files($question->qtype_canvas_image_file, $question->context->id, 'qtype_canvas', 'qtype_canvas_image_file', $question->id, array('subdirs' => 0, 'maxbytes' => 0, 'maxfiles' => 1));
         } else {
         	// No files have been indicated to be uploaded. Check if this is an attempt to make a duplicate copy of this question: 
-        	if (property_exists($question, 'pre_existing_question_id') && $question->pre_existing_question_id != 0) {
+        	if (property_exists($question, 'pre_existing_question_id') && $question->pre_existing_question_id != 0 && $question->pre_existing_question_id != $question->id) {
         		// Yes, this was an edit form which turned out to be a "Make copy", so we need to copy over the background image of the old question into a new record:
         		// First fetch the old one:
         		$oldfiles   = $fs->get_area_files($question->context->id, 'qtype_canvas', 'qtype_canvas_image_file', $question->pre_existing_question_id, 'id');
@@ -158,13 +158,7 @@ class qtype_canvas extends question_type {
         				$fs->create_file_from_storedfile($newfile, $oldfile);
         				continue;
         			}
-        		} else {
-        			// An older question exists but it has no files--what??
-        			return -1;
         		}
-        	} else {
-        		// Something's fishy...
-        		return -1;
         	}
         }
 

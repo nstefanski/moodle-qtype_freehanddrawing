@@ -19,9 +19,9 @@
  *
  * @since      2.0
  * @package    qtype
- * @subpackage ddimageortext
- * @copyright  Dongsheng Cai <dongsheng@moodle.com>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @subpackage canvas 
+ * @copyright  Jacob Shapiro <jacob.shapiro@let.ethz.ch>
+ * @license    http://opensource.org/licenses/BSD-3-Clause
  */
 
 

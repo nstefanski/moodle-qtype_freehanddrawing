@@ -33,7 +33,6 @@ input[type="submit"]:disabled {
 .qtype_canvas_container_div {
 margin: 10px;
     padding: 10px;
-    background-image: url('http://www.michaelkuhlmann.com/hope/wp-content/uploads/texture-wood-purgo.jpg');
     background-position:right top;
     text-align: center;
     display: inline-block;

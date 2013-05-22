@@ -15,12 +15,12 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Short answer question definition class.
+ * canvas question type definition class.
  *
  * @package    qtype
  * @subpackage canvas
- * @copyright  2012 Martin Vögeli (Voma) {@link http://moodle.ch/}, based on 2009 The Open University
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  Jacob Shapiro <jacob.shapiro@let.ethz.ch>
+ * @license    http://opensource.org/licenses/BSD-3-Clause
  */
 
 
@@ -29,10 +29,10 @@ defined('MOODLE_INTERNAL') || die();
 require_once (dirname(__FILE__) . '/renderer.php');
 
 /**
- * Represents a short answer question.
+ * Represents a canvas question.
  *
- * @copyright  2009 The Open University
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  Jacob Shapiro <jacob.shapiro@let.ethz.ch>
+ * @license    http://opensource.org/licenses/BSD-3-Clause
  */
 class qtype_canvas_question extends question_graded_by_strategy
         implements question_response_answer_comparer {

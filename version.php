@@ -15,12 +15,12 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Short answer question type version information.
+ * canvas question type version information.
  *
  * @package    qtype
  * @subpackage canvas
- * @copyright  2012 Martin Vögeli (Voma) {@link http://moodle.ch/}, based on 1999 onwards Martin Dougiamas {@link http://moodle.com}
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  Jacob Shapiro <jacob.shapiro@let.ethz.ch>
+ * @license    http://opensource.org/licenses/BSD-3-Clause
  */
 
 defined('MOODLE_INTERNAL') || die();

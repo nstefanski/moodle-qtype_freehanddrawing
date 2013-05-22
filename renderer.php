@@ -15,22 +15,22 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Short answer question renderer class.
+ * canvas question renderer class.
  *
  * @package	qtype
  * @subpackage canvas
- * @copyright  2012 Martin Vögeli (Voma) {@link http://moodle.ch/}, based on 2009 The Open University
- * @license	http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright Jacob Shapiro <jacob.shapiro@let.ethz.ch> 
+ * @license	http://opensource.org/licenses/BSD-3-Clause
  */
 
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Generates the output for short answer questions.
+ * Generates the output for canvas questions.
  *
- * @copyright  2009 The Open University
- * @license	http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  Jacob Shapiro <jacob.shapiro@let.ethz.ch>
+ * @license	http://opensource.org/licenses/BSD-3-Clause
  */
 class qtype_canvas_renderer extends qtype_renderer {
 
@@ -87,6 +87,7 @@ class qtype_canvas_renderer extends qtype_renderer {
 		$teacherOnlyPixels = 0;
 		$studentOnlyPixels = 0;
 		
+		
 		for ($x = 0; $x < $width; $x++) {
 			for ($y = 0; $y < $height; $y++) {
 				$rgbCorrectAns = imagecolorat($correctAnswerImg, $x, $y);
@@ -95,17 +96,17 @@ class qtype_canvas_renderer extends qtype_renderer {
 					// VALIDATE STUDENT ANSWER
 					$rgbCurrentAns = imagecolorat($currentAnswerImg, $x, $y);
 					$rgbCurrentAnsArray = array(($rgbCurrentAns >> 16) & 0xFF, ($rgbCurrentAns >> 8) & 0xFF, $rgbCurrentAns & 0xFF);
-					if ($rgbCorrectAnsArray[2] == 255 && $rgbCurrentAnsArray[2] == 255) {
+					if (self::isBlue($rgbCorrectAnsArray)  && self::isBlue($rgbCurrentAnsArray)) {
 						$matchingPixels++;
 						if ($createBlendedImg ===  true) {
 							imagesetpixel($blendedImg, $x, $y, $green);
 						}
-					} else if ($rgbCorrectAnsArray[2] == 255 && $rgbCurrentAnsArray[2] == 0) {
+					} else if (self::isBlue($rgbCorrectAnsArray)  && !self::isBlue($rgbCurrentAnsArray)) {
 						$teacherOnlyPixels++;
 						if ($createBlendedImg ===  true) {
 							imagesetpixel($blendedImg, $x, $y, $blue);
 						}
-					} else if ($rgbCorrectAnsArray[2] == 0 && $rgbCurrentAnsArray[2] == 255) {
+					} else if (!self::isBlue($rgbCorrectAnsArray)  && self::isBlue($rgbCurrentAnsArray)) {
 						$studentOnlyPixels++;
 						if ($createBlendedImg ===  true) {
 							imagesetpixel($blendedImg, $x, $y, $red);
@@ -113,7 +114,7 @@ class qtype_canvas_renderer extends qtype_renderer {
 					}
 				} else {
 					// ONLY SHOW CORRECT ANSWER -- NO INPUT FROM USER
-					 if ($rgbCorrectAnsArray[2] == 255) {
+					if (self::isBlue($rgbCorrectAnsArray)) {
 						$teacherOnlyPixels++;
 						if ($createBlendedImg ===  true) {
 							imagesetpixel($blendedImg, $x, $y, $blue);
@@ -122,7 +123,6 @@ class qtype_canvas_renderer extends qtype_renderer {
 				}
 			}
 		}
-		
 		imagedestroy($correctAnswerImg);
 		
 		if (!$onlyShowCorrectAnswer) {
@@ -137,6 +137,12 @@ class qtype_canvas_renderer extends qtype_renderer {
 		}
 		
 		return $matchPercentage;
+	}
+	private static function isBlue($array) {
+		if ($array[0] == 0 && $array[1] == 0 && $array[2] == 255) {
+			return true;
+		}
+		return false;
 	}
 	
 	public static function toDataURL_from_gdImage($gdImage) {
