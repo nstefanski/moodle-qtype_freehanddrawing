@@ -11,6 +11,9 @@
 #fitem_id_qtype_canvas_textarea_id_0 {
 		display: block;
 }
+input[type="submit"]:disabled {
+	display: none;
+}
 .qtype_canvas {
 	align: center;
     margin-left: auto; 

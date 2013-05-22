@@ -181,8 +181,8 @@ class qtype_canvas_renderer extends qtype_renderer {
 		/* Voma Start */
   
 		
-		if ($options->correctness) {
-			
+		if ($options->readonly) {
+			$readonlyCanvas = ' readonly-canvas';
 			$correctAnswer = reset($question->answers)->answer;
 	
 			list($blendedImgDataURL, $matchPercentage) = self::compare_drawings($correctAnswer, $currentAnswer, true);
@@ -193,7 +193,7 @@ class qtype_canvas_renderer extends qtype_renderer {
 					'Y.Moodle.qtype_canvas.form.init', array($question->id, $question->radius, $blendedImgDataURL));
 			
 		} else {
-
+			$readonlyCanvas = '';
 			$this->page->requires->yui_module('moodle-qtype_canvas-form',
 					'Y.Moodle.qtype_canvas.form.init', array($question->id, $question->radius));
 		}
@@ -218,7 +218,7 @@ class qtype_canvas_renderer extends qtype_renderer {
 		}
 
 		$feedbackimg = '';
-		if ($options->correctness) {
+		if ($options->readonly) {
 			$fraction = ($matchPercentage /  ($question->threshold*5+50));
 			$inputattributes['class'] = $this->feedback_class($fraction);
 			$feedbackimg = $this->feedback_image($fraction);
@@ -234,13 +234,13 @@ class qtype_canvas_renderer extends qtype_renderer {
         $bgimageArray = self::get_image_for_question($question);
         
         $canvas = "<div class=\"qtype_canvas_id_" . $question->id . "\">";
-        if ($options->correctness) {
+        if ($options->readonly) {
         	$canvas .= "<h1>".sprintf('%0.2f', $matchPercentage)."% out of necessary ".sprintf('%0.2f', $question->threshold*5+50)."%.</h1><hr>" . $feedbackimg . "<hr>";
         } else {
         	$canvas .= '<img ALT="Erase Canvas" SRC="'.$CFG->wwwroot . '/question/type/canvas/pix/Eraser-icon.png" CLASS="qtype_canvas_eraser">';
         	$canvas .= "<textarea class=\"qtype_canvas_textarea\" name=\"$inputname\" id=\"qtype_canvas_textarea_id_".$question->id."\" rows=20 cols=50>$currentAnswer</textarea>";
         }
-        $canvas .= "<canvas class=\"qtype_canvas\" width=\"".$bgimageArray[1]."\" height=\"".$bgimageArray[2]."\"style=\"background:url('$bgimageArray[0]')\"></canvas></div>";
+        $canvas .= "<canvas class=\"qtype_canvas".$readonlyCanvas."\" width=\"".$bgimageArray[1]."\" height=\"".$bgimageArray[2]."\"style=\"background:url('$bgimageArray[0]')\"></canvas></div>";
         
         
 		//$input = html_writer::empty_tag('input', $inputattributes) . $feedbackimg;

@@ -8,6 +8,7 @@ YUI.add('moodle-qtype_canvas-form', function(Y) {
 	},
 	SELECTORS = {
 			GENERICCANVAS: 'canvas[class="qtype_canvas"]',
+			READONLYCANVAS: 'canvas[class="qtype_canvas readonly-canvas"]',
 			FILEPICKER: '#id_qtype_canvas_image_file',
 			DRAWINGRADIUS: '#id_radius',
 			CHOOSEFILEBUTTON: 'input[name="qtype_canvas_image_filechoose"]',
@@ -86,11 +87,13 @@ YUI.add('moodle-qtype_canvas-form', function(Y) {
 	},
 	
 	draw_correct_answer: function(questionID, correctAnswer) {
-		Y.all(SELECTORS.GENERICCANVAS).each(function(node) {
+		Y.all(SELECTORS.READONLYCANVAS).each(function(node) {
 			if (node.ancestor().getAttribute('class') == 'qtype_canvas_id_' + questionID) {
 				canvasNode = node;
 			}
 		}.bind(this));
+		
+		if (typeof canvasNode != 'undefined') {
 		
 		canvasNode.setStyles({ cursor: 'auto', });
 		
@@ -103,6 +106,7 @@ YUI.add('moodle-qtype_canvas-form', function(Y) {
 			}.bind(this);
 			img.src = correctAnswer;
 		
+		}
 		
 	},
 	choose_new_image_file_click: function(e) {
