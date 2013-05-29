@@ -30,6 +30,7 @@ YUI.add('moodle-qtype_canvas-form', function(Y) {
 			eraser_click_sub: null,
 			canvas_mousedown_sub: null,
 			canvas_mouseup_sub: null,
+			canvas_mouseout_sub: null,
 			drawing_radius_change_sub: null,
 				
 			init: function(questionID, drawingRadius, correctAnswer) {
@@ -59,6 +60,9 @@ YUI.add('moodle-qtype_canvas-form', function(Y) {
 					if(!this.canvas_mouseup_sub) { 
 						this.canvas_mouseup_sub =  Y.delegate('mouseup',   this.canvas_mouseup,    Y.config.doc, SELECTORS.GENERICCANVAS, this); 
 					}
+				if(!this.canvas_mouseout_sub) { 
+					this.canvas_mouseout_sub =  Y.delegate('mouseout',   this.canvas_mouseout,    Y.config.doc, SELECTORS.GENERICCANVAS, this); 
+				}
 					if(!this.drawing_radius_change_sub) { 
 						this.drawing_radius_change_sub =  Y.delegate('change', this.drawing_radius_change, Y.config.doc, SELECTORS.DRAWINGRADIUS, this); 
 					}
@@ -210,14 +214,38 @@ YUI.add('moodle-qtype_canvas-form', function(Y) {
 		questionID = this.canvas_get_question_id(e.currentTarget);
 		this.canvasContext[questionID].beginPath();
 		var offset = e.currentTarget.getXY();
-		this.canvasContext[questionID].moveTo(e.pageX - offset[0], e.pageY - offset[1]);
-		Y.on('mousemove', this.canvas_mousemove, e.currentTarget, this);
+		if (e.pageX - offset[0] < 0 || e.pageY - offset[1] < 0 || e.pageX - offset[0] > e.currentTarget.getDOMNode().width || e.pageY - offset[1] > e.currentTarget.getDOMNode().height) {
+			// we got out of the boundaries of the canvas
+			//this.canvas_mouseup(e);
+		}
+		else {
+			this.canvasContext[questionID].moveTo(e.pageX - offset[0], e.pageY - offset[1]);
+
+			// Added this so that single clicks would also generate something.
+			this.canvasContext[questionID].beginPath();
+			this.canvasContext[questionID].arc(e.pageX - offset[0], e.pageY - offset[1], /*seems to be arbitrary*/this.canvasContext[questionID].lineWidth/40/*not sure about this*/, 0, 2 * Math.PI, false);
+			this.canvasContext[questionID].fillStyle = 'blue';
+			this.canvasContext[questionID].fill();
+			this.canvasContext[questionID].stroke();
+			// ------------------------------------------------------------------  
+
+			Y.on('mousemove', this.canvas_mousemove, e.currentTarget, this);
+		}
 	},
 	canvas_mousemove: function(e) {
 		questionID = this.canvas_get_question_id(e.currentTarget);
 		var offset = e.currentTarget.getXY();
-		this.canvasContext[questionID].lineTo(e.pageX - offset[0], e.pageY - offset[1]);
-		this.canvasContext[questionID].stroke();
+		if (e.pageX - offset[0] < 0 || e.pageY - offset[1] < 0 || e.pageX - offset[0] > e.currentTarget.getDOMNode().width || e.pageY - offset[1] > e.currentTarget.getDOMNode().height) {
+			// we got out of the boundaries of the canvas
+			this.canvas_mouseup(e);
+		}
+		else {
+			this.canvasContext[questionID].lineTo(e.pageX - offset[0], e.pageY - offset[1]);
+			this.canvasContext[questionID].stroke();
+		}
+	},
+	canvas_mouseout: function(e) {
+		this.canvas_mouseup(e);
 	},
 	canvas_mouseup: function(e) {
 		e.currentTarget.detach('mousemove', this.canvas_mousemove);
