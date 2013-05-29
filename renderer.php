@@ -241,7 +241,7 @@ class qtype_canvas_renderer extends qtype_renderer {
         
         $canvas = "<div class=\"qtype_canvas_id_" . $question->id . "\">";
         if ($options->readonly) {
-        	$canvas .= "<h1>".sprintf('%0.2f', $matchPercentage)."% out of necessary ".sprintf('%0.2f', $question->threshold)."%.</h1><hr>" . $feedbackimg . "<hr>";
+        	$canvas .= "<h1>".sprintf('%0.2f', $matchPercentage)."% out of necessary ".sprintf('%0.2f', $question->threshold )."%.</h1><hr>" . $feedbackimg . "<hr>";
         } else {
         	$canvas .= '<img ALT="Erase Canvas" SRC="'.$CFG->wwwroot . '/question/type/canvas/pix/Eraser-icon.png" CLASS="qtype_canvas_eraser">';
         	$canvas .= "<textarea class=\"qtype_canvas_textarea\" name=\"$inputname\" id=\"qtype_canvas_textarea_id_".$question->id."\" rows=20 cols=50>$currentAnswer</textarea>";
@@ -339,6 +339,9 @@ class qtype_canvas_renderer extends qtype_renderer {
     				return null;
     			}
     			$image = imagecreatefromstring($file->get_content());
+    			if ($image === FALSE) {
+    				return null;
+    			}
     			$width = imagesx($image);
     			$height = imagesy($image);
     			$ImgDataURL = self::toDataURL_from_gdImage($image);

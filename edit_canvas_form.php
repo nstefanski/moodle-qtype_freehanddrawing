@@ -96,7 +96,9 @@ class qtype_canvas_edit_form extends question_edit_form {
 
         // TODO: Implement this: http://docs.moodle.org/dev/Using_the_File_API_in_Moodle_forms#Load_existing_files_into_draft_area
         $mform->addElement('filepicker', 'qtype_canvas_image_file', get_string('file'), null,
-                           array('maxbytes' => 1572864/*1.5MB*/, 'accepted_types' => array('image', 'picture')));
+                           array('maxbytes' => 1572864/*1.5MB*/, 'maxfiles' => 1, 'accepted_types' => array('.png', '.jpg', '.jpeg', '.gif')));
+        $mform->addElement('html', "<div class=\"fitem\"><div class=\"fitemtitle\">" .
+        		get_string("accepted_background_image_file_types", "qtype_canvas")."</div><div class=\"felement\">PNG, JPG, GIF</DIV></DIV>");
 
         $mform->addElement('header', 'qtype_canvas_drawing', get_string('drawing', 'qtype_canvas'));
         $mform->addElement('select', 'radius',

@@ -44,4 +44,5 @@ $string['backgroundfilemustbegiven'] = 'You must specify a file as a background 
 $string['drawingmustbegiven'] = 'You must make a drawing.';
 $string['drawanswer'] = 'Draw answer';
 $string['drawing'] = 'Drawing';
+$string['accepted_background_image_file_types'] = 'Accepted file types';
 $string['nobackgroundimageselectedyet'] = 'No background image selected yet.';

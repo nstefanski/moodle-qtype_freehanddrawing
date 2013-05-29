@@ -156,7 +156,7 @@ YUI.add('moodle-qtype_canvas-form', function(Y) {
 			Y.one(SELECTORS.ERASERBUTTON).setStyles({display: 'block'});
 			Y.one(SELECTORS.CONTAINERDIV).setStyles({display: 'inline-block'});
 			Y.one(SELECTORS.NOBACKGROUNDIMAGESELECTEDYET).setStyles({display: 'none'});
-			
+			console.log('FILE PICKER CHANDGE');
 			
 			Y.one(SELECTORS.GENERICCANVAS).getDOMNode().width = image.width;
 			Y.one(SELECTORS.GENERICCANVAS).getDOMNode().height = image.height;
