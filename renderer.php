@@ -225,7 +225,7 @@ class qtype_canvas_renderer extends qtype_renderer {
 
 		$feedbackimg = '';
 		if ($options->readonly) {
-			$fraction = ($matchPercentage /  ($question->threshold*5+50));
+			$fraction = ($matchPercentage /  ($question->threshold));
 			$inputattributes['class'] = $this->feedback_class($fraction);
 			$feedbackimg = $this->feedback_image($fraction);
 		}
@@ -241,7 +241,7 @@ class qtype_canvas_renderer extends qtype_renderer {
         
         $canvas = "<div class=\"qtype_canvas_id_" . $question->id . "\">";
         if ($options->readonly) {
-        	$canvas .= "<h1>".sprintf('%0.2f', $matchPercentage)."% out of necessary ".sprintf('%0.2f', $question->threshold*5+50)."%.</h1><hr>" . $feedbackimg . "<hr>";
+        	$canvas .= "<h1>".sprintf('%0.2f', $matchPercentage)."% out of necessary ".sprintf('%0.2f', $question->threshold)."%.</h1><hr>" . $feedbackimg . "<hr>";
         } else {
         	$canvas .= '<img ALT="Erase Canvas" SRC="'.$CFG->wwwroot . '/question/type/canvas/pix/Eraser-icon.png" CLASS="qtype_canvas_eraser">';
         	$canvas .= "<textarea class=\"qtype_canvas_textarea\" name=\"$inputname\" id=\"qtype_canvas_textarea_id_".$question->id."\" rows=20 cols=50>$currentAnswer</textarea>";

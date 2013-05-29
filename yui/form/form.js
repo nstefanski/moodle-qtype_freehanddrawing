@@ -120,9 +120,9 @@ YUI.add('moodle-qtype_canvas-form', function(Y) {
 	
 	get_drawing_radius: function(questionID) {
 		if (questionID == 0) {
-			this.drawingRadius[0] = Y.one(SELECTORS.DRAWINGRADIUS).get('selectedIndex');
+			this.drawingRadius[0] = Y.one(SELECTORS.DRAWINGRADIUS).get('value');
 		}
-		return this.drawingRadius[questionID]*2+1;
+		return this.drawingRadius[questionID];
 	},
 	
 	
@@ -200,7 +200,7 @@ YUI.add('moodle-qtype_canvas-form', function(Y) {
 				Y.one(SELECTORS.GENERICCANVAS).getDOMNode().width = Y.one(SELECTORS.GENERICCANVAS).getDOMNode().width;
 				this.create_canvas_context(0, false);
 			} else {
-				Y.one(SELECTORS.DRAWINGRADIUS).set('selectedIndex', (this.drawingRadius-1)/2);
+				Y.one(SELECTORS.DRAWINGRADIUS).set('selectedIndex', (this.drawingRadius));
 			}
 		} else {
 			this.create_canvas_context(0);

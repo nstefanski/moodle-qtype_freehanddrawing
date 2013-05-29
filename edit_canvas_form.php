@@ -101,30 +101,45 @@ class qtype_canvas_edit_form extends question_edit_form {
         $mform->addElement('header', 'qtype_canvas_drawing', get_string('drawing', 'qtype_canvas'));
         $mform->addElement('select', 'radius',
         		get_string('radius', 'qtype_canvas'), array(
-        				0 => 1,
-        				1 => 3,
-        				2 => 5,
-        				3 => 7,
-        				4 => 9,
-        				5 => 11,
-        				6 => 13,
-        				7 => 15,
-        				8 => 17,
-        				9 => 19));
+        				1 => 1,
+        				3 => 3,
+        				5 => 5,
+        				7 => 7,
+        				9 => 9,
+        				11 => 11,
+        				13 => 13,
+        				15 => 15,
+        				17 => 17,
+        				19 => 19,
+        				21 => 21,
+        				23 => 23,
+        				25 => 25,
+        				27 => 27,
+        				29 => 29,
+        				31 => 31,
+        				33 => 33,
+        				35 => 35,
+        				37 => 37,
+        				39 => 39,
+        		));
         
         $mform->addElement('select', 'threshold',
         		get_string('threshold', 'qtype_canvas'), array(
-        				0 => 50,
-        				1 => 55,
-        				2 => 60,
-        				3 => 65,
-        				4 => 70,
-        				5 => 75,
-        				6 => 80,
-        				7 => 85,
-        				8 => 90,
-        				9 => 95,
-        				10 => 100));
+        				30 => 30,
+        				35 => 35,
+        				40 => 40,
+        				45 => 45,
+        				50 => 50,
+        				55 => 55,
+        				60 => 60,
+        				65 => 65,
+        				70 => 70,
+        				75 => 75,
+        				80 => 80,
+        				85 => 85,
+        				90 => 90,
+        				95 => 95,
+        				100 => 100));
         //$mform->closeHeaderBefore('drawsolution');
         //$mform->addElement('html', '<img ALT="Erase Canvas" SRC="'.$CFG->wwwroot . '/question/type/canvas/pix/Eraser-icon.png" CLASS="qtype_canvas_eraser" ID="qtype_canvas_eraser_id_0" '.$eraserHTMLParams.'>');
         $mform->addElement('textarea', 'qtype_canvas_textarea_id_0', get_string("drawingrawdata", "qtype_canvas"), 'class="qtype_canvas_textarea" wrap="virtual" rows="20" cols="50"');
@@ -243,6 +258,18 @@ class qtype_canvas_edit_form extends question_edit_form {
         		imagedestroy($imgGDResource);
         	}
         }
+        
+        
+        // Check that the drawing parameters make sense:
+        
+        if ($data['radius'] < 1 || $data['radius'] > 100) {
+        	$errors['radius'] = get_string('radius_must_be_reasonable', 'qtype_canvas');
+        }
+        
+        if ($data['threshold'] <= 0 || $data['threshold'] > 100) {
+        	$errors['threshold'] = get_string('threshold_must_be_reasonable', 'qtype_canvas');
+        }
+        
 //         $answers = $data['answer'];
 //         $answercount = 0;
 //         $maxgrade = false;

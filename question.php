@@ -89,7 +89,7 @@ class qtype_canvas_question extends question_graded_by_strategy
     	
     	$matchPercentage = qtype_canvas_renderer::compare_drawings($answer->answer, $response['answer']);
     	
-    	if (($this->threshold)*5+50 <= $matchPercentage) {
+    	if (($this->threshold) <= $matchPercentage) {
     		$answer->fraction = 1;
     		return true;
     	}
