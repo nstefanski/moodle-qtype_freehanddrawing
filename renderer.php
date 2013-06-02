@@ -190,13 +190,16 @@ class qtype_canvas_renderer extends qtype_renderer {
 		if ($options->readonly) {
 			$readonlyCanvas = ' readonly-canvas';
 			$correctAnswer = reset($question->answers)->answer;
-	
+			
 			list($blendedImgDataURL, $matchPercentage) = self::compare_drawings($correctAnswer, $currentAnswer, true);
-			
-			
-			
-			$this->page->requires->yui_module('moodle-qtype_canvas-form',
-					'Y.Moodle.qtype_canvas.form.init', array($question->id, $question->radius, $blendedImgDataURL));
+			if ($options->correctness === 0) {
+				$this->page->requires->yui_module('moodle-qtype_canvas-form',
+						'Y.Moodle.qtype_canvas.form.init', array($question->id, $question->radius, $currentAnswer));
+			} else {
+				$this->page->requires->yui_module('moodle-qtype_canvas-form',
+						'Y.Moodle.qtype_canvas.form.init', array($question->id, $question->radius, $blendedImgDataURL));
+			}
+
 			
 		} else {
 			$readonlyCanvas = '';
