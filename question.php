@@ -52,11 +52,12 @@ class qtype_canvas_question extends question_graded_by_strategy
     }
 
     public function summarise_response(array $response) {
-        if (isset($response['answer'])) {
-            return $response['answer'];
-        } else {
-            return null;
-        }
+    	return 'no response summary';
+	        if (isset($response['answer'])) {
+	            return $response['answer'];
+	        } else {
+	            return null;
+	        }
     }
 
     public function is_complete_response(array $response) {
@@ -79,7 +80,13 @@ class qtype_canvas_question extends question_graded_by_strategy
     public function get_answers() {
         return $this->answers;
     }
-
+    
+    public function get_correct_response() {
+    	return array('answer' => reset($this->answers)->answer);
+    }
+    public function get_right_answer_summary() {
+    	return 'No correct answer summary for canvas question types.';
+    }
     public function compare_response_with_answer(array $response, question_answer $answer) {
 
     	
