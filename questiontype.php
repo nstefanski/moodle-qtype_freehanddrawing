@@ -19,7 +19,7 @@
  *
  * @package    qtype
  * @subpackage canvas
- * @copyright  Jacob Shapiro <jacob.shapiro@let.ethz.ch>
+ * @copyright  ETHZ LET <jacob.shapiro@let.ethz.ch>
  * @license    http://opensource.org/licenses/BSD-3-Clause
  */
 
@@ -34,7 +34,7 @@ require_once($CFG->dirroot . '/question/type/canvas/question.php');
 /**
  * The canvas question type.
  *
- * @copyright  Jacob Shapiro <jacob.shapiro@let.ethz.ch> 
+ * @copyright  ETHZ LET <jacob.shapiro@let.ethz.ch> 
  * @license    http://opensource.org/licenses/BSD-3-Clause
  */
 class qtype_canvas extends question_type {

@@ -19,7 +19,7 @@
  *
  * @package    qtype
  * @subpackage canvas
- * @copyright  Jacob Shapiro <jacob.shapiro@let.ethz.ch>
+ * @copyright  ETHZ LET <jacob.shapiro@let.ethz.ch>
  * @license    http://opensource.org/licenses/BSD-3-Clause
  */
 
@@ -31,7 +31,7 @@ require_once (dirname(__FILE__) . '/renderer.php');
 /**
  * Represents a canvas question.
  *
- * @copyright  Jacob Shapiro <jacob.shapiro@let.ethz.ch>
+ * @copyright  ETHZ LET <jacob.shapiro@let.ethz.ch>
  * @license    http://opensource.org/licenses/BSD-3-Clause
  */
 class qtype_canvas_question extends question_graded_by_strategy

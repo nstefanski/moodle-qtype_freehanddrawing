@@ -19,7 +19,7 @@
  *
  * @package    qtype
  * @subpackage canvas
- * @copyright  Jacob Shapiro <jacob.shapiro@let.ethz.ch>
+ * @copyright  ETHZ LET <jacob.shapiro@let.ethz.ch>
  * @license    http://opensource.org/licenses/BSD-3-Clause
  */
 

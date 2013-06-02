@@ -19,8 +19,8 @@
  *
  * @package    qtype
  * @subpackage canvas
- * @copyright  2012 Martin Vögeli (Voma) {@link http://moodle.ch/}, based on 1999 onwards Martin Dougiamas {@link http://moodle.com}
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  ETHZ LET <jacob.shapiro@let.ethz.ch>
+ * @license    http://opensource.org/licenses/BSD-3-Clause
  */
 
 $string['radius'] = 'Set radius of points (pixel)';

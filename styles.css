@@ -1,3 +1,9 @@
+/*
+ * @package    qtype
+ * @subpackage canvas
+ * @copyright  ETHZ LET <jacob.shapiro@let.ethz.ch>
+ * @license    http://opensource.org/licenses/BSD-3-Clause
+*/
 #fitem_id_qtype_canvas_textarea {
     display: block;
 }

@@ -1,5 +1,9 @@
 /**
  * This is JavaScript code that handles drawing on mouse events and painting pre-existing drawings.
+ * @package    qtype
+ * @subpackage canvas
+ * @copyright  ETHZ LET <jacob.shapiro@let.ethz.ch>
+ * @license    http://opensource.org/licenses/BSD-3-Clause
  */
 
 YUI.add('moodle-qtype_canvas-form', function(Y) {

@@ -19,8 +19,8 @@
  *
  * @package    qtype
  * @subpackage canvas
- * @copyright  2010 The Open University
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  ETHZ LET <jacob.shapiro@let.ethz.ch>
+ * @license    http://opensource.org/licenses/BSD-3-Clause
  */
 
 

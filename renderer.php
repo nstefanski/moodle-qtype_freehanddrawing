@@ -19,7 +19,7 @@
  *
  * @package	qtype
  * @subpackage canvas
- * @copyright Jacob Shapiro <jacob.shapiro@let.ethz.ch> 
+ * @copyright ETHZ LET <jacob.shapiro@let.ethz.ch> 
  * @license	http://opensource.org/licenses/BSD-3-Clause
  */
 
@@ -29,7 +29,7 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Generates the output for canvas questions.
  *
- * @copyright  Jacob Shapiro <jacob.shapiro@let.ethz.ch>
+ * @copyright  ETHZ LET <jacob.shapiro@let.ethz.ch>
  * @license	http://opensource.org/licenses/BSD-3-Clause
  */
 class qtype_canvas_renderer extends qtype_renderer {
