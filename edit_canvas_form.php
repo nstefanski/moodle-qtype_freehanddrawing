@@ -256,6 +256,11 @@ class qtype_canvas_edit_form extends question_edit_form {
         		// Check that it has non-zero dimensions (would've been nice to check that its dimensions fit those of the uploaded file but perhaps that is an overkill??)
         		if (imagesx($imgGDResource) != $bgWidth || imagesy($imgGDResource) != $bgHeight) {
         			$errors["qtype_canvas_textarea_id_0"] = get_string('drawingmustbegiven', 'qtype_canvas');
+        		} else {
+        			// Check that the image is non-empty
+        			if (self::isImageTransparent($imgGDResource, $bgWidth, $bgHeight) === true) {
+        				$errors["qtype_canvas_textarea_id_0"] = get_string('drawingmustbegiven', 'qtype_canvas');
+        			}
         		}
         		imagedestroy($imgGDResource);
         	}
@@ -296,7 +301,18 @@ class qtype_canvas_edit_form extends question_edit_form {
 //         }
         return $errors;
     }
-
+	private function isImageTransparent($gdImage, $width, $height) {
+		for ($x = 0; $x < $width; $x++) {
+			for ($y = 0; $y < $height; $y++) {
+				// Check the alpha channel (4th byte from the right) if it's completely transparent
+				if (((imagecolorat($gdImage, $x, $y) >> 24) & 0xFF) !== 127/*127 means completely transparent*/) {
+					// Something is painted, great!
+						return false;
+				}
+			}
+		}
+		return true;
+	}
     public function qtype() {
         return 'canvas';
     }
