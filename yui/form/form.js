@@ -38,7 +38,6 @@ YUI.add('moodle-qtype_canvas-form', function(Y) {
 			drawing_radius_change_sub: null,
 				
 			init: function(questionID, drawingRadius, correctAnswer) {
-				// This is how to access i18n strings: alert( M.util.get_string('drawingmustbegiven', 'qtype_canvas'));
 				if (typeof correctAnswer != 'undefined') {
 					this.drawingRadius[questionID] = drawingRadius;
 					this.draw_correct_answer(questionID, correctAnswer);
@@ -87,7 +86,7 @@ YUI.add('moodle-qtype_canvas-form', function(Y) {
 			}.bind(this));
 		}
 		if (this.is_canvas_empty(questionID) == false) {
-			if (confirm('Are you sure you want to erase the canvas?') == true) {
+			if (confirm(M.util.get_string('are_you_sure_you_want_to_erase_the_canvas', 'qtype_canvas')) == true) {
 				canvasNode.getDOMNode().width = canvasNode.getDOMNode().width;
 				this.create_canvas_context(questionID, false);
 			}
@@ -119,7 +118,7 @@ YUI.add('moodle-qtype_canvas-form', function(Y) {
 	},
 	choose_new_image_file_click: function(e) {
 		if (this.is_canvas_empty(0) == false) {
-			if (confirm('You have drawn something onto the canvas. Choosing a new image file will erase this. Are you sure you want to go on?') == false) {
+			if (confirm(M.util.get_string('are_you_sure_you_want_to_pick_a_new_bgimage', 'qtype_canvas')) == false) {
 				Y.one('.file-picker.fp-generallayout').one('.yui3-button.yui3-button-close').simulate("click");
 			}
 		}
@@ -204,7 +203,7 @@ YUI.add('moodle-qtype_canvas-form', function(Y) {
 	},
 	drawing_radius_change: function(e) {
 		if (this.is_canvas_empty(0) == false) {
-			if (confirm('If you change the drawing radius now, I will have to erase the whole canvas. Are you okay with that?') == true) {
+			if (confirm(M.util.get_string('are_you_sure_you_want_to_change_the_drawing_radius', 'qtype_canvas')) == true) {
 				Y.one(SELECTORS.GENERICCANVAS).getDOMNode().width = Y.one(SELECTORS.GENERICCANVAS).getDOMNode().width;
 				this.create_canvas_context(0, false);
 			} else {

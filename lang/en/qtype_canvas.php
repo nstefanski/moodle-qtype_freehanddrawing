@@ -46,3 +46,6 @@ $string['drawanswer'] = 'Draw answer';
 $string['drawing'] = 'Drawing';
 $string['accepted_background_image_file_types'] = 'Accepted file types';
 $string['nobackgroundimageselectedyet'] = 'No background image selected yet.';
+$string['are_you_sure_you_want_to_erase_the_canvas'] = 'Are you sure you want to erase the canvas?';
+$string['are_you_sure_you_want_to_pick_a_new_bgimage'] = 'You have drawn something onto the canvas. Choosing a new image file will erase this. Are you sure you want to go on?';
+$string['are_you_sure_you_want_to_change_the_drawing_radius'] = 'If you change the drawing radius now, I will have to erase the whole canvas. Are you okay with that?';
