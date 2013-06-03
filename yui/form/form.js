@@ -38,6 +38,7 @@ YUI.add('moodle-qtype_canvas-form', function(Y) {
 			drawing_radius_change_sub: null,
 				
 			init: function(questionID, drawingRadius, correctAnswer) {
+				// This is how to access i18n strings: alert( M.util.get_string('drawingmustbegiven', 'qtype_canvas'));
 				if (typeof correctAnswer != 'undefined') {
 					this.drawingRadius[questionID] = drawingRadius;
 					this.draw_correct_answer(questionID, correctAnswer);

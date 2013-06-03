@@ -158,9 +158,8 @@ class qtype_canvas_edit_form extends question_edit_form {
     }
     public function js_call() {
         global $PAGE;
-        $params = array('nothing'=>1);
-        $PAGE->requires->yui_module('moodle-qtype_canvas-form',
-                'Y.Moodle.qtype_canvas.form.init', array(0, 0));
+        qtype_canvas_renderer::requireTranslationsIntoJS();
+        $PAGE->requires->yui_module('moodle-qtype_canvas-form', 'Y.Moodle.qtype_canvas.form.init', array(0, 0));
     }
 
     protected function data_preprocessing($question) {

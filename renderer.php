@@ -34,6 +34,15 @@ defined('MOODLE_INTERNAL') || die();
  */
 class qtype_canvas_renderer extends qtype_renderer {
 
+
+	
+	public static function requireTranslationsIntoJS() {
+		global $PAGE;
+		foreach (array_keys(get_string_manager()->load_component_strings('qtype_canvas', current_language())) as $string) {
+			$PAGE->requires->string_for_js($string, 'qtype_canvas');
+		}
+	}
+	
 	public static  function strstr_after($haystack, $needle, $case_insensitive = false) {
 		$strpos = ($case_insensitive) ? 'stripos' : 'strpos';
 		$pos = $strpos($haystack, $needle);
@@ -190,14 +199,12 @@ class qtype_canvas_renderer extends qtype_renderer {
 		if ($options->readonly) {
 			$readonlyCanvas = ' readonly-canvas';
 			$correctAnswer = reset($question->answers)->answer;
-			
 			list($blendedImgDataURL, $matchPercentage) = self::compare_drawings($correctAnswer, $currentAnswer, true);
+			qtype_canvas_renderer::requireTranslationsIntoJS();
 			if ($options->correctness === 0) {
-				$this->page->requires->yui_module('moodle-qtype_canvas-form',
-						'Y.Moodle.qtype_canvas.form.init', array($question->id, $question->radius, $currentAnswer));
+				$this->page->requires->yui_module('moodle-qtype_canvas-form', 'Y.Moodle.qtype_canvas.form.init', array($question->id, $question->radius, $currentAnswer));
 			} else {
-				$this->page->requires->yui_module('moodle-qtype_canvas-form',
-						'Y.Moodle.qtype_canvas.form.init', array($question->id, $question->radius, $blendedImgDataURL));
+				$this->page->requires->yui_module('moodle-qtype_canvas-form', 'Y.Moodle.qtype_canvas.form.init', array($question->id, $question->radius, $blendedImgDataURL));
 			}
 
 			
