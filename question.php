@@ -52,7 +52,7 @@ class qtype_canvas_question extends question_graded_by_strategy
     }
 
     public function summarise_response(array $response) {
-    	return 'no response summary';
+    	return get_string('no_response_summary', 'qtype_canvas');
 	        if (isset($response['answer'])) {
 	            return $response['answer'];
 	        } else {
@@ -85,7 +85,7 @@ class qtype_canvas_question extends question_graded_by_strategy
     	return array('answer' => reset($this->answers)->answer);
     }
     public function get_right_answer_summary() {
-    	return 'No correct answer summary for canvas question types.';
+    	return get_string('no_correct_answer_summary', 'qtype_canvas');
     }
     public function compare_response_with_answer(array $response, question_answer $answer) {
 

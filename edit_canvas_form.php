@@ -102,7 +102,7 @@ class qtype_canvas_edit_form extends question_edit_form {
 
         $mform->addElement('header', 'qtype_canvas_drawing', get_string('drawing', 'qtype_canvas'));
         $mform->addElement('select', 'radius',
-        		get_string('radius', 'qtype_canvas'), array(
+        		get_string('set_radius', 'qtype_canvas'), array(
         				1 => 1,
         				3 => 3,
         				5 => 5,
@@ -126,7 +126,7 @@ class qtype_canvas_edit_form extends question_edit_form {
         		));
         
         $mform->addElement('select', 'threshold',
-        		get_string('threshold', 'qtype_canvas'), array(
+        		get_string('threshold_for_correct_answers', 'qtype_canvas'), array(
         				30 => 30,
         				35 => 35,
         				40 => 40,
@@ -149,7 +149,7 @@ class qtype_canvas_edit_form extends question_edit_form {
         $mform->addElement('html', '<div class="fitem"><div class="fitemtitle">' . 
         		get_string("drawanswer", "qtype_canvas").'</div><div class="felement"><div class="qtype_canvas_no_background_image_selected_yet" '.$noBackgroundImageSelectedYetStyle.'>' . 
         		get_string('nobackgroundimageselectedyet', 'qtype_canvas') . 
-        		'</div><div class="qtype_canvas_container_div" '.$eraserHTMLParams.'><img ALT="Erase Canvas" SRC="'.$CFG->wwwroot . '/question/type/canvas/pix/Eraser-icon.png" CLASS="qtype_canvas_eraser" ID="qtype_canvas_eraser_id_0" '.$eraserHTMLParams.'><canvas class="qtype_canvas" '.$canvasHTMLParams.'>');
+        		'</div><div class="qtype_canvas_container_div" '.$eraserHTMLParams.'><img ALT="'.get_string("erase_canvas", "qtype_canvas").'" SRC="'.$CFG->wwwroot . '/question/type/canvas/pix/Eraser-icon.png" CLASS="qtype_canvas_eraser" ID="qtype_canvas_eraser_id_0" '.$eraserHTMLParams.'><canvas class="qtype_canvas" '.$canvasHTMLParams.'>');
         //$this->add_per_answer_fields($mform, get_string('answerno', 'qtype_canvas', '{no}'), question_bank::fraction_options());
 
         $this->add_interactive_settings();

@@ -251,9 +251,9 @@ class qtype_canvas_renderer extends qtype_renderer {
         
         $canvas = "<div class=\"qtype_canvas_id_" . $question->id . "\">";
         if ($options->readonly) {
-        	$canvas .= "<h1>".sprintf('%0.2f', $matchPercentage)."% out of necessary ".sprintf('%0.2f', $question->threshold )."%.</h1><hr>" . $feedbackimg . "<hr>";
+        	$canvas .= "<h1>".sprintf('%0.2f', $matchPercentage)."% ".get_string("out_of_necessary", "qtype_canvas")." ".sprintf('%0.2f', $question->threshold )."%.</h1><hr>" . $feedbackimg . "<hr>";
         } else {
-        	$canvas .= '<img ALT="Erase Canvas" SRC="'.$CFG->wwwroot . '/question/type/canvas/pix/Eraser-icon.png" CLASS="qtype_canvas_eraser">';
+        	$canvas .= '<img ALT="'.get_string("erase_canvas", "qtype_canvas").'" SRC="'.$CFG->wwwroot . '/question/type/canvas/pix/Eraser-icon.png" CLASS="qtype_canvas_eraser">';
         	$canvas .= "<textarea class=\"qtype_canvas_textarea\" name=\"$inputname\" id=\"qtype_canvas_textarea_id_".$question->id."\" rows=20 cols=50>$currentAnswer</textarea>";
         }
         $canvas .= "<canvas class=\"qtype_canvas".$readonlyCanvas."\" width=\"".$bgimageArray[1]."\" height=\"".$bgimageArray[2]."\"style=\"background:url('$bgimageArray[0]')\"></canvas></div>";
@@ -314,7 +314,7 @@ class qtype_canvas_renderer extends qtype_renderer {
 	}
 
 	public function correct_response(question_attempt $qa) {
-		return '';
+		return ''; /* still not sure what kind of text should be given back for this....*/
 		$question = $qa->get_question();
 
 		$answer = $question->get_matching_answer($question->get_correct_response());

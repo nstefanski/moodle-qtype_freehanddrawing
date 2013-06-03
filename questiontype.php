@@ -203,6 +203,11 @@ class qtype_canvas extends question_type {
         return array($questiondata->id => $responses);
     }
 	// Voma add start
+	
+    
+    
+    
+    // TODO: MAke sure this works.
 	// http://moodle.org/plugins/pluginversions.php?plugin=qtype_regexp
     function export_to_xml($question, qformat_xml $format, $extra=null) {
     	$extraquestionfields = $this->extra_question_fields();
