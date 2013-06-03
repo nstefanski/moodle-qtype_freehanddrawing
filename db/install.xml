@@ -9,7 +9,7 @@
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="questionid"/>
         <FIELD NAME="questionid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="Foreign key references question.id." PREVIOUS="id" NEXT="threshold"/>
         <FIELD NAME="threshold" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="Threshold for correct answers (%)" PREVIOUS="questionid" NEXT="radius"/>
-        <FIELD NAME="radius" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="Radius for Drawing" PREVIOUS="threshold"/>
+        <FIELD NAME="radius" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="Radius for Drawing (pixels)" PREVIOUS="threshold"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="questionid"/>
