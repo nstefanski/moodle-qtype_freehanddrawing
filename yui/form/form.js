@@ -21,7 +21,8 @@ YUI.add('moodle-qtype_canvas-form', function(Y) {
 			ERASERBUTTON: 'img[class="qtype_canvas_eraser"]',
 			CONTAINERDIV: 'div[class="qtype_canvas_container_div"]',
 			NOBACKGROUNDIMAGESELECTEDYET: 'div[class="qtype_canvas_no_background_image_selected_yet"]',
-			CANVASTEXTAREA: 'textarea[id="qtype_canvas_textarea_id_0"]',
+			CANVASTEXTAREAEDITMODE: 'textarea[name="qtype_canvas_textarea_id_0"]',
+			CANVASTEXTAREATESTMODE: 'textarea[id="qtype_canvas_textarea_id_',
 	};
 	Y.namespace('Moodle.qtype_canvas.form');
 
@@ -215,16 +216,17 @@ YUI.add('moodle-qtype_canvas-form', function(Y) {
 		this.canvasContext[questionID].strokeStyle = 'blue';
 		
 		textarea = this.canvas_get_textarea(canvasNode);
-		
-		if (applyTextArea == false) {
-			textarea.set('value', '');
-		} else {
-			if (textarea.get('value') != '') {
-				var img = new Image();
-				img.onload = function() {
-					this.canvasContext[questionID].drawImage(img, 0, 0);
-				}.bind(this);
-				img.src = textarea.get('value');
+		if (textarea != null) {
+			if (applyTextArea == false) {
+				textarea.set('value', '');
+			} else {
+				if (textarea.get('value') != '') {
+					var img = new Image();
+					img.onload = function() {
+						this.canvasContext[questionID].drawImage(img, 0, 0);
+					}.bind(this);
+					img.src = textarea.get('value');
+				}
 			}
 		}
 	},
@@ -281,14 +283,15 @@ YUI.add('moodle-qtype_canvas-form', function(Y) {
 		e.currentTarget.detach('mousemove', this.canvas_mousemove);
 		this.canvas_get_textarea(e.currentTarget).set('value', e.currentTarget.getDOMNode().toDataURL());
 	},
-	canvas_get_textarea: function(node) {
-		questionID = this.canvas_get_question_id(node);
-		if (questionID == 0) {
-			return Y.one(SELECTORS.CANVASTEXTAREA);
-		} else {
-			return Y.one(SELECTORS.CANVASTEXTAREA.replace('0', questionID));
-		}
-	},
+    canvas_get_textarea: function(node) {
+        questionID = this.canvas_get_question_id(node);
+        if (questionID == 0) {
+                       return Y.one(SELECTORS.CANVASTEXTAREAEDITMODE);
+        } else {
+                       return Y.one(SELECTORS.CANVASTEXTAREATESTMODE+questionID+'"]');
+        }
+},
+
 	canvas_get_question_id: function(node) {
 		if (node.ancestor().getAttribute('class').indexOf('qtype_canvas_id') == -1) {
 			return 0;
