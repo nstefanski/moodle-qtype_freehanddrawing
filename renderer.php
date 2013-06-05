@@ -185,16 +185,9 @@ class qtype_canvas_renderer extends qtype_renderer {
 		$currentAnswer = $qa->get_last_qt_var('answer');
 
 		$inputname = $qa->get_qt_field_name('answer');
-		$inputattributes = array(
-			'type' => 'text',
-			'name' => $inputname,
-			'value' => $currentAnswer,
-			'id' => $inputname,
-			'size' => 80,
-		);
 
-		/* Voma Start */
-  
+		$bgimageArray = self::get_image_for_question($question);
+		$canvas = "<div class=\"qtype_canvas_id_" . $question->id . "\">";
 		
 		if ($options->readonly) {
 			$readonlyCanvas = ' readonly-canvas';
@@ -206,92 +199,25 @@ class qtype_canvas_renderer extends qtype_renderer {
 			} else {
 				$this->page->requires->yui_module('moodle-qtype_canvas-form', 'Y.Moodle.qtype_canvas.form.init', array($question->id, $question->radius, $blendedImgDataURL));
 			}
-
-			
+			$fraction = ($matchPercentage /  ($question->threshold));
+			$feedbackimg = $this->feedback_image($fraction);
+			$canvas .= "<h1>".sprintf('%0.2f', $matchPercentage)."% ".get_string("out_of_necessary", "qtype_canvas")." ".sprintf('%0.2f', $question->threshold )."%.</h1><hr>" . $feedbackimg . "<hr>";
 		} else {
 			$readonlyCanvas = '';
-			$this->page->requires->yui_module('moodle-qtype_canvas-form',
-					'Y.Moodle.qtype_canvas.form.init', array($question->id, $question->radius));
-		}
-// 		// Prepare some variables
-// 		$temp1; 
-// 		$temp2; // temporary variables
-		
-// 		$strID = str_replace ("answer", "", $inputattributes['id']);
-		
-// 		$temp1 = $question->answers;
-// 		$temp2 = reset($temp1); 
-		
-// 		$strSolution = $temp2->answer;
-// 		$temp2 = next($temp1); 
-// 		$strURL = $temp2->answer;
-// 		$temp2 = next($temp1); 
-// 		$intRadius = $temp2->answer;
-// 		/* Voma End */
-
-		if ($options->readonly) {
-			$inputattributes['readonly'] = 'readonly';
+			$this->page->requires->yui_module('moodle-qtype_canvas-form', 'Y.Moodle.qtype_canvas.form.init', array($question->id, $question->radius));
+			$canvas .= '<img ALT="'.get_string("erase_canvas", "qtype_canvas").'" SRC="'.$CFG->wwwroot . '/question/type/canvas/pix/Eraser-icon.png" CLASS="qtype_canvas_eraser">';
+			$canvas .= "<textarea class=\"qtype_canvas_textarea\" name=\"$inputname\" id=\"qtype_canvas_textarea_id_".$question->id."\" rows=20 cols=50>$currentAnswer</textarea>";
+			
 		}
 
-		$feedbackimg = '';
-		if ($options->readonly) {
-			$fraction = ($matchPercentage /  ($question->threshold));
-			$inputattributes['class'] = $this->feedback_class($fraction);
-			$feedbackimg = $this->feedback_image($fraction);
-		}
-
+		$canvas .= "<canvas class=\"qtype_canvas".$readonlyCanvas."\" width=\"".$bgimageArray[1]."\" height=\"".$bgimageArray[2]."\"style=\"background:url('$bgimageArray[0]')\"></canvas></div>";
+		
+		
 		$questiontext = $question->format_questiontext($qa);
-		$placeholder = false;
-		if (preg_match('/_____+/', $questiontext, $matches)) {
-			$placeholder = $matches[0];
-			$inputattributes['size'] = round(strlen($placeholder) * 1.1);
-		}
 
-        $bgimageArray = self::get_image_for_question($question);
-        
-        $canvas = "<div class=\"qtype_canvas_id_" . $question->id . "\">";
-        if ($options->readonly) {
-        	$canvas .= "<h1>".sprintf('%0.2f', $matchPercentage)."% ".get_string("out_of_necessary", "qtype_canvas")." ".sprintf('%0.2f', $question->threshold )."%.</h1><hr>" . $feedbackimg . "<hr>";
-        } else {
-        	$canvas .= '<img ALT="'.get_string("erase_canvas", "qtype_canvas").'" SRC="'.$CFG->wwwroot . '/question/type/canvas/pix/Eraser-icon.png" CLASS="qtype_canvas_eraser">';
-        	$canvas .= "<textarea class=\"qtype_canvas_textarea\" name=\"$inputname\" id=\"qtype_canvas_textarea_id_".$question->id."\" rows=20 cols=50>$currentAnswer</textarea>";
-        }
-        $canvas .= "<canvas class=\"qtype_canvas".$readonlyCanvas."\" width=\"".$bgimageArray[1]."\" height=\"".$bgimageArray[2]."\"style=\"background:url('$bgimageArray[0]')\"></canvas></div>";
-        
-        
-		//$input = html_writer::empty_tag('input', $inputattributes) . $feedbackimg;
-        
-        
-
-// 		if ($placeholder) {
-// 			$questiontext = substr_replace($questiontext, $input,
-// 					strpos($questiontext, $placeholder), strlen($placeholder));
-// 		}
 
 		$result = html_writer::tag('div', $questiontext . $canvas, array('class' => 'qtext'));
 
-// 		if (!$placeholder) {
-// 			$result .= html_writer::start_tag('div', array('class' => 'ablock'));
-// 			$result .= get_string('answer', 'qtype_canvas',
-// 					html_writer::tag('div', $input, array('class' => 'answer')));
-// 			/* Voma Start */
-// 			// Write hidden field Solution
-// 			// if(strpos($_SERVER["PHP_SELF"], "review.php")){
-// 				$temp1 = array('id' => $strID.'solution', 'name' => $strID.'solution', 'type' => 'hidden', 'value' => $strSolution);
-// 				$result .= html_writer::empty_tag('input', $temp1);
-// 			// }
-// 			// Write hidden field URL
-// 			$temp1 = array('id' => $strID.'url', 'name' => $strID.'url', 'type' => 'hidden', 'value' => $strURL);
-// 			$result .= html_writer::empty_tag('input', $temp1);
-// 			// Write hidden field Radius
-// 			$temp1 = array('id' => $strID.'radius', 'name' => $strID.'radius', 'type' => 'hidden', 'value' => $intRadius);
-// 			$result .= html_writer::empty_tag('input', $temp1);
-// 			// Write DIV for canvas
-// 			$result .= html_writer::start_tag('div', array('class' => 'qtype_canvas', 'id' => $strID));
-// 			$result .= html_writer::end_tag('div');
-// 			/* Voma End */
-// 			$result .= html_writer::end_tag('div');
-// 		}
 
 		if ($qa->get_state() == question_state::$invalid) {
 			$result .= html_writer::nonempty_tag('div',
