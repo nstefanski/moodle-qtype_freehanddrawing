@@ -361,7 +361,40 @@ class qtype_canvas_renderer extends qtype_renderer {
     	}
     	return null;
     }
-
+    public static function isDataURLAValidDrawing($dataURL, $bgWidth, $bgHeight) {
+    	$imgData = base64_decode(qtype_canvas_renderer::strstr_after($dataURL, 'base64,'));
+    	$imgGDResource =  imagecreatefromstring($imgData);
+    	if ($imgGDResource === FALSE) {
+    		return false;
+    	} else {
+    		// Check that it has non-zero dimensions (would've been nice to check that its dimensions fit those of the uploaded file but perhaps that is an overkill??)
+    		if (imagesx($imgGDResource) != $bgWidth || imagesy($imgGDResource) != $bgHeight) {
+    			return false;
+    		} else {
+    			// Check that the image is non-empty
+    			if (self::isImageTransparent($imgGDResource, $bgWidth, $bgHeight) === true) {
+    				return false;
+    			}
+    		}
+    		imagedestroy($imgGDResource);
+    		return true;
+    	}
+    	return false;
+    }
+    
+    
+    private static function isImageTransparent($gdImage, $width, $height) {
+    	for ($x = 0; $x < $width; $x++) {
+    		for ($y = 0; $y < $height; $y++) {
+    			// Check the alpha channel (4th byte from the right) if it's completely transparent
+    			if (((imagecolorat($gdImage, $x, $y) >> 24) & 0xFF) !== 127/*127 means completely transparent*/) {
+    				// Something is painted, great!
+    				return false;
+    			}
+    		}
+    	}
+    	return true;
+    }
 
 
 
