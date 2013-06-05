@@ -48,12 +48,10 @@ class qtype_canvas extends question_type {
 
     public function move_files($questionid, $oldcontextid, $newcontextid) {
         parent::move_files($questionid, $oldcontextid, $newcontextid);
-        $this->move_files_in_answers($questionid, $oldcontextid, $newcontextid);
     }
 
     protected function delete_files($questionid, $contextid) {
         parent::delete_files($questionid, $contextid);
-        $this->delete_files_in_answers($questionid, $contextid);
     }
 
     public function save_question_options($question) {
@@ -61,66 +59,21 @@ class qtype_canvas extends question_type {
         $result = new stdClass();
 
         $context = $question->context;
-
-        $oldanswers = $DB->get_records('question_answers', array('question' => $question->id), 'id ASC');
-
-        //$answers = array();
-        //$maxfraction = -1;
-
-//         // Insert all the new answers
-//         if (array_key_exists('answer', $question)) {
-//         	foreach ($question->answer as $key => $answerdata) {
-//         		// Check for, and ignore, completely blank answer from the form.
-//         		if (trim($answerdata) == '' && $question->fraction[$key] == 0 &&
-//         		html_is_blank($question->feedback[$key]['text'])) {
-//         			continue;
-//         		}
-
-//         		// Update an existing answer if possible.
-//         		$answer = array_shift($oldanswers);
-//         		if (!$answer) {
-//         			$answer = new stdClass();
-//         			$answer->question = $question->id;
-//         			$answer->answer = '';
-//         			$answer->feedback = '';
-//         			$answer->id = $DB->insert_record('question_answers', $answer);
-//         		}
-
-//         		$answer->answer   = trim($answerdata);
-//         		$answer->fraction = $question->fraction[$key];
-//         		$answer->feedback = $this->import_or_save_files($question->feedback[$key],
-//         				$context, 'question', 'answerfeedback', $answer->id);
-//         		$answer->feedbackformat = $question->feedback[$key]['format'];
-//         		$DB->update_record('question_answers', $answer);
-
-//         		$answers[] = $answer->id;
-//         		if ($question->fraction[$key] > $maxfraction) {
-//         			$maxfraction = $question->fraction[$key];
-//         		}
-//         	}
-//         }
-
-        
-        
-//			$question->answers = implode(',', $answers);
-        
         
         $parentresult = parent::save_question_options($question);
+        
         if ($parentresult !== null) {
             // Parent function returns null if all is OK
             return $parentresult;
         }
 
-        
         $this->save_hints($question);
         
         // Delete any left over old answer records.
-       
+        $oldanswers = $DB->get_records('question_answers', array('question' => $question->id), 'id ASC');
         foreach ($oldanswers as $oldanswer) {
             $DB->delete_records('question_answers', array('id' => $oldanswer->id));
         }
-
-     
 		// Save the new answer:
         $answer = new stdClass();
         $answer->question = $question->id;
@@ -173,39 +126,8 @@ class qtype_canvas extends question_type {
     }
 
     public function get_random_guess_score($questiondata) {
-        foreach ($questiondata->options->answers as $aid => $answer) {
-            if ('*' == trim($answer->answer)) {
-                return $answer->fraction;
-            }
-        }
         return 0;
-    }
-
-    public function get_possible_responses($questiondata) {
-        $responses = array();
-
-        $starfound = false;
-        foreach ($questiondata->options->answers as $aid => $answer) {
-            $responses[$aid] = new question_possible_response($answer->answer,
-                    $answer->fraction);
-            if ($answer->answer === '*') {
-                $starfound = true;
-            }
-        }
-
-        if (!$starfound) {
-            $responses[0] = new question_possible_response(
-                    get_string('didnotmatchanyanswer', 'question'), 0);
-        }
-
-        $responses[null] = question_possible_response::no_response();
-
-        return array($questiondata->id => $responses);
-    }
-	// Voma add start
-	
-    
-    
+    }    
     
     // TODO: MAke sure this works.
 	// http://moodle.org/plugins/pluginversions.php?plugin=qtype_regexp
@@ -245,5 +167,4 @@ class qtype_canvas extends question_type {
         }
         return $expout;   	
     }
-	// Voma add end
 }
