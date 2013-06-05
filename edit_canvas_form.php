@@ -32,9 +32,6 @@ class qtype_canvas_edit_form extends question_edit_form {
     protected function definition_inner($mform) {
         global $PAGE, $CFG, $USER;
         
-        
-        
-        
         $usercontext = context_user::instance($USER->id);
         $bgImageArray = null;
         $canvasTextAreaPreexistingAnswer = '';
@@ -54,13 +51,14 @@ class qtype_canvas_edit_form extends question_edit_form {
         		// Question already exists! We are in edit mode.
         		
         		// --------------------------------------------------------
-        		// This is in case duplicates are requested to be made:
+        		// This is in case duplicates are requested to be made (so that the saving code in question.php would know there was a pre-existing question):
         		$mform->addElement('hidden', 'pre_existing_question_id', $question->id);
         		// --------------------------------------------------------
         		
         		
         		
         		$bgImageArray = qtype_canvas_renderer::get_image_for_question($question);
+        		// This is the structure of the array:
         		// 0 image dataURL string
         		// 1 width
         		// 2 height
@@ -81,19 +79,22 @@ class qtype_canvas_edit_form extends question_edit_form {
         	
         	
         	} else {
+        		// No draft bg image, no pre-existing saved files
+        		// Seems like we are in "add new" (BRAND new) form mode
+        		// In this case the canvas shouldn't be visible until a bg image has been chosen.
         		$canvasHTMLParams = 'style="display: none;"';
         		$eraserHTMLParams = 'style="display: none;"';
         	}	
         }
         
+        // File picker
         $mform->addElement('header', 'qtype_canvas_drawing_background_image', get_string('drawing_background_image', 'qtype_canvas'));
-
-        // TODO: Implement this: http://docs.moodle.org/dev/Using_the_File_API_in_Moodle_forms#Load_existing_files_into_draft_area
         $mform->addElement('filepicker', 'qtype_canvas_image_file', get_string('file'), null,
                            array('maxbytes' => 1572864/*1.5MB*/, 'maxfiles' => 1, 'accepted_types' => array('.png', '.jpg', '.jpeg', '.gif')));
         $mform->addElement('html', "<div class=\"fitem\"><div class=\"fitemtitle\">" .
         		get_string("accepted_background_image_file_types", "qtype_canvas")."</div><div class=\"felement\">PNG, JPG, GIF</DIV></DIV>");
-
+        
+        // Drawing Parameters and *actual* canvas
         $mform->addElement('header', 'qtype_canvas_drawing', get_string('drawing', 'qtype_canvas'));
         $mform->addElement('select', 'radius',
         		get_string('set_radius', 'qtype_canvas'), array(
@@ -118,7 +119,6 @@ class qtype_canvas_edit_form extends question_edit_form {
         				37 => 37,
         				39 => 39,
         		));
-        
         $mform->addElement('select', 'threshold',
         		get_string('threshold_for_correct_answers', 'qtype_canvas'), array(
         				30 => 30,
@@ -136,15 +136,12 @@ class qtype_canvas_edit_form extends question_edit_form {
         				90 => 90,
         				95 => 95,
         				100 => 100));
-        //$mform->closeHeaderBefore('drawsolution');
-        //$mform->addElement('html', '<img ALT="Erase Canvas" SRC="'.$CFG->wwwroot . '/question/type/canvas/pix/Eraser-icon.png" CLASS="qtype_canvas_eraser" ID="qtype_canvas_eraser_id_0" '.$eraserHTMLParams.'>');
         $mform->addElement('textarea', 'qtype_canvas_textarea_id_0', get_string("drawingrawdata", "qtype_canvas"), 'class="qtype_canvas_textarea" wrap="virtual" rows="20" cols="50"');
         $mform->setDefault('qtype_canvas_textarea_id_0', $canvasTextAreaPreexistingAnswer);
         $mform->addElement('html', '<div class="fitem"><div class="fitemtitle">' . 
         		get_string("drawanswer", "qtype_canvas").'</div><div class="felement"><div class="qtype_canvas_no_background_image_selected_yet" '.$noBackgroundImageSelectedYetStyle.'>' . 
         		get_string('nobackgroundimageselectedyet', 'qtype_canvas') . 
         		'</div><div class="qtype_canvas_container_div" '.$eraserHTMLParams.'><img ALT="'.get_string("erase_canvas", "qtype_canvas").'" SRC="'.$CFG->wwwroot . '/question/type/canvas/pix/Eraser-icon.png" CLASS="qtype_canvas_eraser" ID="qtype_canvas_eraser_id_0" '.$eraserHTMLParams.'><canvas class="qtype_canvas" '.$canvasHTMLParams.'>');
-        //$this->add_per_answer_fields($mform, get_string('answerno', 'qtype_canvas', '{no}'), question_bank::fraction_options());
 
         $this->add_interactive_settings();
 
@@ -246,28 +243,6 @@ class qtype_canvas_edit_form extends question_edit_form {
         	$errors['threshold'] = get_string('threshold_must_be_reasonable', 'qtype_canvas');
         }
         
-//         $answers = $data['answer'];
-//         $answercount = 0;
-//         $maxgrade = false;
-//         foreach ($answers as $key => $answer) {
-//             $trimmedanswer = trim($answer);
-//             if ($trimmedanswer !== '') {
-//                 $answercount++;
-//                 if ($data['fraction'][$key] == 1) {
-//                     $maxgrade = true;
-//                 }
-//             } else if ($data['fraction'][$key] != 0 ||
-//                     !html_is_blank($data['feedback'][$key]['text'])) {
-//                 $errors["answer[$key]"] = get_string('answermustbegiven', 'qtype_canvas');
-//                 $answercount++;
-//             }
-//         }
-//         if ($answercount==0) {
-//             $errors['answer[0]'] = get_string('notenoughanswers', 'qtype_canvas', 1);
-//         }
-//         if ($maxgrade == false) {
-//             $errors['fraction[0]'] = get_string('fractionsnomax', 'question');
-//         }
         return $errors;
     }
 	private function isImageTransparent($gdImage, $width, $height) {
