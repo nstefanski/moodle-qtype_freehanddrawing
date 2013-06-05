@@ -57,11 +57,10 @@ YUI.add('moodle-qtype_canvas-form', function(Y) {
 						this.create_canvas_context(questionID);
 						if (questionID == 0) {
 							// This is a question edit or "add new" form
-							// Check if this is an edit form
-							allegedBGImgURL = Y.one(SELECTORS.GENERICCANVAS).getStyle('backgroundImage');
-							if ((allegedBGImgURL != '' && allegedBGImgURL != 'none')) {
-								// A background image is already set for the canvas from the get-go, this means we _are_ in edit mode
-								// So in edit mode we'd like to hide the file-picker widget (until further notice... later...)
+							// Check if this is an edit form with a pre-existing (on the server) saved image:
+							if (Y.one(SELECTORS.CHOOSEANOTHERFILEBUTTON) != null) {
+								// So if there's a pre-existing background image
+								// we'd like to hide the file-picker widget (until further notice... (click by 'choose another background'...)
 								this.edit_mode = true;
 								Y.one(SELECTORS.FILEPICKERFIELDSET).setStyles({display: 'none'});
 								Y.delegate('click', function() {
