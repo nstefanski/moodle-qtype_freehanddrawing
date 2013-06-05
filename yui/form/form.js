@@ -21,6 +21,7 @@ YUI.add('moodle-qtype_canvas-form', function(Y) {
 			ERASERBUTTON: 'img[class="qtype_canvas_eraser"]',
 			CONTAINERDIV: 'div[class="qtype_canvas_container_div"]',
 			NOBACKGROUNDIMAGESELECTEDYET: 'div[class="qtype_canvas_no_background_image_selected_yet"]',
+			CANVASTEXTAREA: 'textarea[id="qtype_canvas_textarea_id_0"]',
 	};
 	Y.namespace('Moodle.qtype_canvas.form');
 
@@ -63,10 +64,7 @@ YUI.add('moodle-qtype_canvas-form', function(Y) {
 								// we'd like to hide the file-picker widget (until further notice... (click by 'choose another background'...)
 								this.edit_mode = true;
 								Y.one(SELECTORS.FILEPICKERFIELDSET).setStyles({display: 'none'});
-								Y.delegate('click', function() {
-									Y.one(SELECTORS.CHOOSEFILEBUTTON).simulate('click');
-								}, Y.config.doc, SELECTORS.CHOOSEANOTHERFILEBUTTON, this); 
-								
+								Y.delegate('click', function() { Y.one(SELECTORS.CHOOSEFILEBUTTON).simulate('click'); }, Y.config.doc, SELECTORS.CHOOSEANOTHERFILEBUTTON, this); 
 							}
 						}
 					}
@@ -286,9 +284,9 @@ YUI.add('moodle-qtype_canvas-form', function(Y) {
 	canvas_get_textarea: function(node) {
 		questionID = this.canvas_get_question_id(node);
 		if (questionID == 0) {
-			return Y.one('textarea[name="qtype_canvas_textarea_id_0"]');
+			return Y.one(SELECTORS.CANVASTEXTAREA);
 		} else {
-			return Y.one('textarea[id="qtype_canvas_textarea_id_'+questionID+'"]');
+			return Y.one(SELECTORS.CANVASTEXTAREA.replace('0', questionID));
 		}
 	},
 	canvas_get_question_id: function(node) {
