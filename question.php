@@ -28,15 +28,15 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once (dirname(__FILE__) . '/renderer.php');
 
+
 /**
  * Represents a canvas question.
  *
  * @copyright  ETHZ LET <jacob.shapiro@let.ethz.ch>
  * @license    http://opensource.org/licenses/BSD-3-Clause
  */
-class qtype_canvas_question extends question_graded_by_strategy
-        implements question_response_answer_comparer {
-    /** @var boolean whether answers should be graded case-sensitively. */
+class qtype_canvas_question extends question_graded_by_strategy implements question_response_answer_comparer {
+
     public $threshold;
     public $radius;
 
@@ -53,18 +53,22 @@ class qtype_canvas_question extends question_graded_by_strategy
 
     public function summarise_response(array $response) {
     	return get_string('no_response_summary', 'qtype_canvas');
-	        if (isset($response['answer'])) {
-	            return $response['answer'];
-	        } else {
-	            return null;
-	        }
     }
 
     public function is_complete_response(array $response) {
-        return array_key_exists('answer', $response) &&
-                ($response['answer'] || $response['answer'] === '0');
+    	if (array_key_exists('answer', $response)) {
+    		if ($response['answer'] != '') {
+    			$bgImageArray = qtype_canvas_renderer::get_image_for_question($this);
+    			if (qtype_canvas_renderer::isDataURLAValidDrawing($response['answer'], $bgImageArray[1], $bgImageArray[2])) {
+    				return true;
+    			}
+    		}
+    	}
+    	return false;
     }
-
+	public function is_gradable_response($response) {
+		return is_complete_response($response);
+	}
     public function get_validation_error(array $response) {
         if ($this->is_gradable_response($response)) {
             return '';
@@ -106,26 +110,6 @@ class qtype_canvas_question extends question_graded_by_strategy
     	
     	
 	}
-	/* Voma end */
-
-//     public static function compare_string_with_wildcard($string, $pattern, $ignorecase) {
-//         // Break the string on non-escaped asterisks.
-//         $bits = preg_split('/(?<!\\\\)\*/', $pattern);
-//         // Escape regexp special characters in the bits.
-//         $excapedbits = array();
-//         foreach ($bits as $bit) {
-//             $excapedbits[] = preg_quote(str_replace('\*', '*', $bit));
-//         }
-//         // Put it back together to make the regexp.
-//         $regexp = '|^' . implode('.*', $excapedbits) . '$|u';
-
-//         // Make the match insensitive if requested to.
-//         if ($ignorecase) {
-//             $regexp .= 'i';
-//         }
-
-//         return preg_match($regexp, trim($string));
-//     }
 
     public function check_file_access($qa, $options, $component, $filearea,
             $args, $forcedownload) {
