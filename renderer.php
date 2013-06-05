@@ -356,7 +356,7 @@ class qtype_canvas_renderer extends qtype_renderer {
     			$height = imagesy($image);
     			$ImgDataURL = self::toDataURL_from_gdImage($image);
     			imagedestroy($image);
-    			return array($ImgDataURL, $width, $height, $file->get_itemid());
+    			return array($ImgDataURL, $width, $height, $file->get_filename());
     		}
     	}
     	return null;

@@ -33,6 +33,8 @@ class qtype_canvas_edit_form extends question_edit_form {
         global $PAGE, $CFG, $USER;
         
         
+        
+        
         $usercontext = context_user::instance($USER->id);
         $bgImageArray = null;
         $canvasTextAreaPreexistingAnswer = '';
@@ -59,26 +61,23 @@ class qtype_canvas_edit_form extends question_edit_form {
         		
         		
         		$bgImageArray = qtype_canvas_renderer::get_image_for_question($question);
+        		// 0 image dataURL string
+        		// 1 width
+        		// 2 height
+        		// 3 filename string
+        		
+        		
         		$canvasHTMLParams = "width=\"".$bgImageArray[1]."\" height=\"".$bgImageArray[2]."\"style=\"background:url('$bgImageArray[0]')\"";
         		
         		$noBackgroundImageSelectedYetStyle = 'style="display: none;"';
         		 
         		$canvasTextAreaPreexistingAnswer = reset($question->answers)->answer;
         		
-        		
-        		
-        		
-        		// Tried to implement this:  http://docs.moodle.org/dev/Using_the_File_API_in_Moodle_forms#Load_existing_files_into_draft_area
-//   				// $bgImageArray[3] will contain the $file->get_itemid() so that we can load it up for the UI in the form.
-        		$entry = new stdClass;
-        		$entry->id = null;
-        		file_prepare_draft_area($bgImageArray[3], $question->contextid, 'qtype_canvas', 'qtype_canvas_image_file', $question->id, array('maxbytes' => 1572864/*1.5MB*/, 'accepted_types' => array('image', 'picture')));
-        		$entry->attachments = $bgImageArray[3];
-        		
-        		
-        		
-        		//$this->$mform->set_data($entry); //<-- for some reason this doesn't exist even though it's in the DOCS! seems to work only for moodleforms:: and not for QuickForm?
-        		
+  				// This will be a UI aid to make sure the user knows a file has been chosen rather than just displaying the empty file picker widget 
+				// which doesn't indicate that there is already a background image file associated with the question.
+        		$mform->addElement('header', 'qtype_canvas_drawing_background_image_selected', get_string('drawing_background_image', 'qtype_canvas'));
+        		$mform->addElement('html', "<div class=\"fitem\"><div class=\"fitemtitle\">" .
+        				get_string("selected_background_image_filename", "qtype_canvas")."</div><div class=\"felement\"><a HREF='$bgImageArray[0]'>$bgImageArray[3]</a>&nbsp;<input type=\"button\" class=\"fp-btn-choose\" value=\"Choose a different file...\" name=\"qtype_canvas_image_filechoose_another\"></DIV></DIV>");
         	
         	
         	} else {
@@ -87,12 +86,7 @@ class qtype_canvas_edit_form extends question_edit_form {
         	}	
         }
         
-        
-        
-        
         $mform->addElement('header', 'qtype_canvas_drawing_background_image', get_string('drawing_background_image', 'qtype_canvas'));
-  
- 
 
         // TODO: Implement this: http://docs.moodle.org/dev/Using_the_File_API_in_Moodle_forms#Load_existing_files_into_draft_area
         $mform->addElement('filepicker', 'qtype_canvas_image_file', get_string('file'), null,
@@ -166,31 +160,7 @@ class qtype_canvas_edit_form extends question_edit_form {
         $question = parent::data_preprocessing($question);
         $question = $this->data_preprocessing_answers($question);
         $question = $this->data_preprocessing_hints($question);
-        $this->js_call();
-        
-        
-//         if (array_key_exists('id', $this->question) === true) {
-//         	$question = $this->question;
-//         	if (array_key_exists('contextid', $question) === false || array_key_exists('answers', $question) === false) {
-//         		$question = question_bank::load_question($question->id, false);
-//         	}
-//         	// Question already exists! We are in edit mode.
-//         	$bgImageArray = qtype_canvas_renderer::get_image_for_question($question);
-        
-//         	// Tried to implement this:  http://docs.moodle.org/dev/Using_the_File_API_in_Moodle_forms#Load_existing_files_into_draft_area
-//         	//   				// $bgImageArray[3] will contain the $file->get_itemid() so that we can load it up for the UI in the form.
-//         	//$entry = new stdClass;
-//         	//$entry->id = null;
-//         	//file_prepare_draft_area($bgImageArray[3], $question->contextid, 'qtype_canvas', 'qtype_canvas_image_file', $question->id, array('maxbytes' => 1572864/*1.5MB*/, 'accepted_types' => array('image', 'picture')));
-//         	//$question->qtype_canvas_image_files =  $bgImageArray[3];
-       
-        
-        	 
-        	 
-//         }
-        
-        
-        
+        $this->js_call();        
         return $question;
     }
 

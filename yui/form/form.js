@@ -13,8 +13,11 @@ YUI.add('moodle-qtype_canvas-form', function(Y) {
 			GENERICCANVAS: 'canvas[class="qtype_canvas"]',
 			READONLYCANVAS: 'canvas[class="qtype_canvas readonly-canvas"]',
 			FILEPICKER: '#id_qtype_canvas_image_file',
+			FILEPICKERFIELDSET: '#qtype_canvas_drawing_background_image',
+			FILEPICKERFIELDSETANOTHER: '#qtype_canvas_drawing_background_image_selected',
 			DRAWINGRADIUS: '#id_radius',
 			CHOOSEFILEBUTTON: 'input[name="qtype_canvas_image_filechoose"]',
+			CHOOSEANOTHERFILEBUTTON: 'input[name="qtype_canvas_image_filechoose_another"]',
 			ERASERBUTTON: 'img[class="qtype_canvas_eraser"]',
 			CONTAINERDIV: 'div[class="qtype_canvas_container_div"]',
 			NOBACKGROUNDIMAGESELECTEDYET: 'div[class="qtype_canvas_no_background_image_selected_yet"]',
@@ -36,17 +39,37 @@ YUI.add('moodle-qtype_canvas-form', function(Y) {
 			canvas_mouseup_sub: null,
 			canvas_mouseout_sub: null,
 			drawing_radius_change_sub: null,
+			edit_mode: false,
 				
 			init: function(questionID, drawingRadius, correctAnswer) {
 				if (typeof correctAnswer != 'undefined') {
+					// A correct answer is provided by the argument list--so this means the canvas is to be treated as READ ONLY
 					this.drawingRadius[questionID] = drawingRadius;
 					this.draw_correct_answer(questionID, correctAnswer);
 				} else {
-
+					// No correct answer provided in argument list (although one might pre-exist in the textarea)
+					// This means we allow drawing by the user.
 					if (typeof questionID != 'undefined') {
+						// A questionID should actually always be defined (even when it's a newly created question, in which case the question ID should be given as zero)
+						// But better safe than sorry
 						this.drawingRadius[questionID] = drawingRadius;
 						this.emptyCanvasDataURL[questionID] = Y.one(SELECTORS.GENERICCANVAS).getDOMNode().toDataURL();
 						this.create_canvas_context(questionID);
+						if (questionID == 0) {
+							// This is a question edit or "add new" form
+							// Check if this is an edit form
+							allegedBGImgURL = Y.one(SELECTORS.GENERICCANVAS).getStyle('backgroundImage');
+							if ((allegedBGImgURL != '' && allegedBGImgURL != 'none')) {
+								// A background image is already set for the canvas from the get-go, this means we _are_ in edit mode
+								// So in edit mode we'd like to hide the file-picker widget (until further notice... later...)
+								this.edit_mode = true;
+								Y.one(SELECTORS.FILEPICKERFIELDSET).setStyles({display: 'none'});
+								Y.delegate('click', function() {
+									Y.one(SELECTORS.CHOOSEFILEBUTTON).simulate('click');
+								}, Y.config.doc, SELECTORS.CHOOSEANOTHERFILEBUTTON, this); 
+								
+							}
+						}
 					}
 					
 					if(!this.filepicker_change_sub) { 
@@ -119,7 +142,7 @@ YUI.add('moodle-qtype_canvas-form', function(Y) {
 	choose_new_image_file_click: function(e) {
 		if (this.is_canvas_empty(0) == false) {
 			if (confirm(M.util.get_string('are_you_sure_you_want_to_pick_a_new_bgimage', 'qtype_canvas')) == false) {
-				Y.one('.file-picker.fp-generallayout').one('.yui3-button.yui3-button-close').simulate("click");
+				Y.one('.file-picker.fp-generallayout').one('.yui3-button.yui3-button-close').simulate("click");	
 			}
 		}
 	},
@@ -152,6 +175,13 @@ YUI.add('moodle-qtype_canvas-form', function(Y) {
 	},
 	filepicker_change: function(e) {
 		// The clicked qtype_canvas can be found at e.currentTarget.
+		
+		if (this.edit_mode == true) {
+			Y.one(SELECTORS.FILEPICKERFIELDSET).setStyles({display: 'block'});
+			Y.one(SELECTORS.FILEPICKERFIELDSETANOTHER).setStyles({display: 'none'});
+		}
+		
+		
 		var imgURL = Y.one('#id_qtype_canvas_image_file').ancestor().one('div.filepicker-filelist a').get('href');
 		var image = new Image();
 		image.src = imgURL;

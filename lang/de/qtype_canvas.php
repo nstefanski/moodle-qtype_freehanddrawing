@@ -54,3 +54,4 @@ $string['erase_canvas'] = 'Lösch Leinwand';
 $string['no_response_summary'] = 'Keine Reaktion Zusammenfassung';
 $string['no_correct_answer_summary'] = 'Keine richtige Antwort Zusammenfassung Leinwand Fragetypen.';
 $string['out_of_necessary'] = 'von notwendigen';
+$string['selected_background_image_filename'] = 'Ausgewählte Hintergrundbild';
