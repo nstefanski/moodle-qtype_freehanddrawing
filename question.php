@@ -66,8 +66,8 @@ class qtype_canvas_question extends question_graded_by_strategy implements quest
     	}
     	return false;
     }
-	public function is_gradable_response($response) {
-		return is_complete_response($response);
+	public function is_gradable_response(array $response) {
+		return self::is_complete_response($response);
 	}
     public function get_validation_error(array $response) {
         if ($this->is_gradable_response($response)) {
