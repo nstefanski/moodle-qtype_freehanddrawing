@@ -26,7 +26,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'qtype_canvas';
-$plugin->version   = 2012052200;
+$plugin->version   = 2013061100;
 
 $plugin->requires  = 2011102700;
 
