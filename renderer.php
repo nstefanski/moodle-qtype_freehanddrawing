@@ -187,6 +187,11 @@ class qtype_canvas_renderer extends qtype_renderer {
 		$inputname = $qa->get_qt_field_name('answer');
 
 		$bgimageArray = self::get_image_for_question($question);
+		
+		if ($bgimageArray === null) {
+			return html_writer::tag('div', '<h1>Unable to fetch canvas background image file');
+		}
+		
 		$canvas = "<div class=\"qtype_canvas_id_" . $question->id . "\">";
 		
 		if ($options->readonly) {
