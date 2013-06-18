@@ -215,7 +215,7 @@ class qtype_freehanddrawing_renderer extends qtype_renderer {
 			
 		}
 
-		$canvas .= "<canvas class=\"qtype_freehanddrawing".$readonlyCanvas."\" width=\"".$bgimageArray[1]."\" height=\"".$bgimageArray[2]."\"style=\"background:url('$bgimageArray[0]')\"></canvas></div>";
+		$canvas .= "<canvas class=\"qtype_freehanddrawing_canvas".$readonlyCanvas."\" width=\"".$bgimageArray[1]."\" height=\"".$bgimageArray[2]."\"style=\"background:url('$bgimageArray[0]')\"></canvas></div>";
 		
 		
 		$questiontext = $question->format_questiontext($qa);

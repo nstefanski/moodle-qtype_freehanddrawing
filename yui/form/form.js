@@ -292,10 +292,10 @@ YUI.add('moodle-qtype_freehanddrawing-form', function(Y) {
 },
 
 	canvas_get_question_id: function(node) {
-		if (node.ancestor().getAttribute('class').indexOf('qtype_freehanddrawing_canvas_id') == -1) {
+		if (node.ancestor().getAttribute('class').indexOf('qtype_freehanddrawing_id') == -1) {
 			return 0;
 		} else {
-			return node.ancestor().getAttribute('class').replace(/qtype_freehanddrawing_canvas_id_/gi, '');
+			return node.ancestor().getAttribute('class').replace(/qtype_freehanddrawing_id_/gi, '');
 		}
 	},
 };
