@@ -23,11 +23,11 @@
  * @license    http://opensource.org/licenses/BSD-3-Clause
  */
 
-$string['pluginname'] = 'Canvas';
-$string['pluginname_help'] = 'In response to a question the respondent draws an answer on an predefined image. There is only one right answer possible.';
-$string['pluginname_link'] = 'question/type/canvas';
-$string['pluginnameadding'] = 'Adding a canvas question';
-$string['pluginnameediting'] = 'Editing a canvas question';
+$string['pluginname'] = 'Freehand Drawing';
+$string['pluginname_help'] = 'In response to a question the respondent draws a solution on a predefined image. There is only one right answer possible.';
+$string['pluginname_link'] = 'question/type/freehanddrawing';
+$string['pluginnameadding'] = 'Adding a Freehand Drawing question';
+$string['pluginnameediting'] = 'Editing a Freehand Drawing question';
 $string['pluginnamesummary'] = 'In response to a question the respondent draws an answer on an predefined image. There is only one right answer possible.';
 $string['threshold_for_correct_answers'] = 'Threshold for correct answers (%)';
 //$string['addmoreanswerblanks'] = 'Blanks for {no} More Answers';
@@ -39,19 +39,19 @@ $string['correctansweris'] = 'The correct answer is: {$a}.';
 $string['pleaseenterananswer'] = 'Please enter an answer.';
 $string['drawing_background_image'] = 'Background Image';
 $string['drawingrawdata'] = '';
-$string['backgroundfilemustbegiven'] = 'You must specify a file as a background image for the canvas.';
+$string['backgroundfilemustbegiven'] = 'You must specify a file as a background image for the freehand drawing.';
 $string['drawingmustbegiven'] = 'You must make a drawing.';
 $string['drawanswer'] = 'Draw answer';
 $string['drawing'] = 'Drawing';
 $string['accepted_background_image_file_types'] = 'Accepted file types';
 $string['nobackgroundimageselectedyet'] = 'No background image selected yet.';
-$string['are_you_sure_you_want_to_erase_the_canvas'] = 'Are you sure you want to erase the canvas?';
-$string['are_you_sure_you_want_to_pick_a_new_bgimage'] = 'You have drawn something onto the canvas. Choosing a new image file will erase this. Are you sure you want to go on?';
-$string['are_you_sure_you_want_to_change_the_drawing_radius'] = 'If you change the drawing radius now, I will have to erase the whole canvas. Are you okay with that?';
-$string['set_radius'] = 'Set radius of points (pixel)';
+$string['are_you_sure_you_want_to_erase_the_canvas'] = 'Are you sure you want to erase your drawing?';
+$string['are_you_sure_you_want_to_pick_a_new_bgimage'] = 'You have drawn a solution. Choosing a new image file will erase this. Are you sure you want to go on?';
+$string['are_you_sure_you_want_to_change_the_drawing_radius'] = 'If you change the drawing radius now, it will erase your solution. Are you okay with that?';
+$string['set_radius'] = 'Set size of the pencil (pixel)';
 $string['threshold_must_be_reasonable'] = 'You must select a reasonable threshold.';
-$string['erase_canvas'] = 'Erase Canvas';
+$string['erase_canvas'] = 'Erase your answer';
 $string['no_response_summary'] = 'No response summary';
-$string['no_correct_answer_summary'] = 'No correct answer summary for canvas question types.';
+$string['no_correct_answer_summary'] = 'No correct answer summary for freehand drawing question types.';
 $string['out_of_necessary'] = 'out of necessary';
 $string['selected_background_image_filename'] = 'Selected background image';

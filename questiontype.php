@@ -15,10 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Question type class for the canvas question type.
+ * Question type class for the freehanddrawing question type.
  *
  * @package    qtype
- * @subpackage canvas
+ * @subpackage freehanddrawing
  * @copyright  ETHZ LET <jacob.shapiro@let.ethz.ch>
  * @license    http://opensource.org/licenses/BSD-3-Clause
  */
@@ -28,18 +28,18 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir . '/questionlib.php');
 require_once($CFG->dirroot . '/question/engine/lib.php');
-require_once($CFG->dirroot . '/question/type/canvas/question.php');
+require_once($CFG->dirroot . '/question/type/freehanddrawing/question.php');
 require_once (dirname(__FILE__) . '/renderer.php');
 
 /**
- * The canvas question type.
+ * The freehanddrawing question type.
  *
  * @copyright  ETHZ LET <jacob.shapiro@let.ethz.ch> 
  * @license    http://opensource.org/licenses/BSD-3-Clause
  */
-class qtype_canvas extends question_type {
+class qtype_freehanddrawing extends question_type {
     public function extra_question_fields() {
-        return array('qtype_canvas', 'threshold', 'radius');
+        return array('qtype_freehanddrawing', 'threshold', 'radius');
     }
 
     public function questionid_column_name() {
@@ -77,7 +77,7 @@ class qtype_canvas extends question_type {
 		// Save the new answer:
         $answer = new stdClass();
         $answer->question = $question->id;
-        $answer->answer = $question->qtype_canvas_textarea_id_0;
+        $answer->answer = $question->qtype_freehanddrawing_textarea_id_0;
         $answer->feedback = '';
         $answer->id = $DB->insert_record('question_answers', $answer);
         
@@ -85,16 +85,16 @@ class qtype_canvas extends question_type {
         
         $fs = get_file_storage();
         $usercontext = context_user::instance($USER->id);
-        $draftfiles = $fs->get_area_files($usercontext->id, 'user', 'draft', $question->qtype_canvas_image_file, 'id');
+        $draftfiles = $fs->get_area_files($usercontext->id, 'user', 'draft', $question->qtype_freehanddrawing_image_file, 'id');
         if (count($draftfiles) >= 2) {
-        	$fs->delete_area_files( $question->context->id, 'qtype_canvas', 'qtype_canvas_image_file', $question->id);
-        	file_save_draft_area_files($question->qtype_canvas_image_file, $question->context->id, 'qtype_canvas', 'qtype_canvas_image_file', $question->id, array('subdirs' => 0, 'maxbytes' => 0, 'maxfiles' => 1));
+        	$fs->delete_area_files( $question->context->id, 'qtype_freehanddrawing', 'qtype_freehanddrawing_image_file', $question->id);
+        	file_save_draft_area_files($question->qtype_freehanddrawing_image_file, $question->context->id, 'qtype_freehanddrawing', 'qtype_freehanddrawing_image_file', $question->id, array('subdirs' => 0, 'maxbytes' => 0, 'maxfiles' => 1));
         } else {
         	// No files have been indicated to be uploaded. Check if this is an attempt to make a duplicate copy of this question (and that this is not a simple EDIT, in which case we don't have to do anything to the background image file): 
         	if (property_exists($question, 'pre_existing_question_id') && $question->pre_existing_question_id != 0 && $question->pre_existing_question_id != $question->id) {
         		// Yes, this was an edit form which turned out to be a "Make copy", so we need to copy over the background image of the old question into a new record:
         		// First fetch the old one:
-        		$oldfiles   = $fs->get_area_files($question->context->id, 'qtype_canvas', 'qtype_canvas_image_file', $question->pre_existing_question_id, 'id');
+        		$oldfiles   = $fs->get_area_files($question->context->id, 'qtype_freehanddrawing', 'qtype_freehanddrawing_image_file', $question->pre_existing_question_id, 'id');
         		if (count($oldfiles) >= 2) {
         			// Files indeed exist.
         			foreach ($oldfiles as $oldfile) {
@@ -103,8 +103,8 @@ class qtype_canvas extends question_type {
         				}
         				$newfile = array(
         						'contextid' => $question->context->id, // ID of context
-        						'component' => 'qtype_canvas',     // usually = table name
-        						'filearea' => 'qtype_canvas_image_file',     // usually = table name
+        						'component' => 'qtype_freehanddrawing',     // usually = table name
+        						'filearea' => 'qtype_freehanddrawing_image_file',     // usually = table name
         						'itemid' => $question->id,               // usually = ID of row in table
         						'filepath' => '/',           // any path beginning and ending in /
         						'filename' => $oldfile->get_filename()); // any filename
@@ -148,7 +148,7 @@ class qtype_canvas extends question_type {
         }
 		
         $expout .= '<bgimage>';
-        $bgImageArray = qtype_canvas_renderer::get_image_for_question($question);
+        $bgImageArray = qtype_freehanddrawing_renderer::get_image_for_question($question);
         $expout .= '<filename>' . $bgImageArray[3] .  '</filename>';
         $expout .= '<dataURL><![CDATA[' . $bgImageArray[0] . ']]></dataURL>';
         $expout .= '</bgimage>';
@@ -168,12 +168,12 @@ class qtype_canvas extends question_type {
     
     
     public function import_from_xml($data, $question, qformat_xml $format, $extra=null) {
-    	if (!isset($data['@']['type']) || $data['@']['type'] != 'canvas') {
+    	if (!isset($data['@']['type']) || $data['@']['type'] != 'freehanddrawing') {
     		return false;
     	}
 
     	$question = $format->import_headers($data);
-    	$question->qtype = 'canvas';
+    	$question->qtype = 'freehanddrawing';
 
     	$question->shuffleanswers = array_key_exists('shuffleanswers', $format->getpath($data, array('#'), array()));
     	
@@ -195,8 +195,8 @@ class qtype_canvas extends question_type {
     		}
     	}
     	// Save drawn solution -------------------------------------
-    	$question->qtype_canvas_textarea_id_0 = $format->getpath($data, array('#', 'answer', '0', '#', 'text', '0', '#'), 'does_not_exist');
-    	if ($question->qtype_canvas_textarea_id_0 === 'does_not_exist') {
+    	$question->qtype_freehanddrawing_textarea_id_0 = $format->getpath($data, array('#', 'answer', '0', '#', 'text', '0', '#'), 'does_not_exist');
+    	if ($question->qtype_freehanddrawing_textarea_id_0 === 'does_not_exist') {
     		return false;
     	}
     	// Save canvas background image file ---------------------
@@ -207,7 +207,7 @@ class qtype_canvas extends question_type {
     		return false;
     	}
     	// Convert dataURL to binary
-    	$imgBinaryData = base64_decode(qtype_canvas_renderer::strstr_after($bgImageArray[0], 'base64,'));
+    	$imgBinaryData = base64_decode(qtype_freehanddrawing_renderer::strstr_after($bgImageArray[0], 'base64,'));
     	// Make sure this is a valid image file we could read
     	if (($GDimg = imagecreatefromstring($imgBinaryData)) === false) {
     		return false;
@@ -218,12 +218,12 @@ class qtype_canvas extends question_type {
     	global $USER;
     	$fs = get_file_storage();
     	$usercontext = context_user::instance($USER->id);
-    	$question->qtype_canvas_image_file = file_get_unused_draft_itemid();
+    	$question->qtype_freehanddrawing_image_file = file_get_unused_draft_itemid();
     	$record = new stdClass();
     	$record->contextid = $usercontext->id;
     	$record->component = 'user';
     	$record->filearea  = 'draft';
-    	$record->itemid    = $question->qtype_canvas_image_file;
+    	$record->itemid    = $question->qtype_freehanddrawing_image_file;
     	$record->filename  = $bgImageArray[3];
     	$record->filepath  = '/';
     	$fs->create_file_from_string($record, $imgBinaryData);

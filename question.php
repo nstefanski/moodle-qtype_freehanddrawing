@@ -15,10 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * canvas question type definition class.
+ * freehanddrawing question type definition class.
  *
  * @package    qtype
- * @subpackage canvas
+ * @subpackage freehanddrawing
  * @copyright  ETHZ LET <jacob.shapiro@let.ethz.ch>
  * @license    http://opensource.org/licenses/BSD-3-Clause
  */
@@ -30,12 +30,12 @@ require_once (dirname(__FILE__) . '/renderer.php');
 
 
 /**
- * Represents a canvas question.
+ * Represents a freehanddrawing question.
  *
  * @copyright  ETHZ LET <jacob.shapiro@let.ethz.ch>
  * @license    http://opensource.org/licenses/BSD-3-Clause
  */
-class qtype_canvas_question extends question_graded_by_strategy implements question_response_answer_comparer {
+class qtype_freehanddrawing_question extends question_graded_by_strategy implements question_response_answer_comparer {
 
     public $threshold;
     public $radius;
@@ -52,14 +52,14 @@ class qtype_canvas_question extends question_graded_by_strategy implements quest
     }
 
     public function summarise_response(array $response) {
-    	return get_string('no_response_summary', 'qtype_canvas');
+    	return get_string('no_response_summary', 'qtype_freehanddrawing');
     }
 
     public function is_complete_response(array $response) {
     	if (array_key_exists('answer', $response)) {
     		if ($response['answer'] != '') {
-    			$bgImageArray = qtype_canvas_renderer::get_image_for_question($this);
-    			if (qtype_canvas_renderer::isDataURLAValidDrawing($response['answer'], $bgImageArray[1], $bgImageArray[2])) {
+    			$bgImageArray = qtype_freehanddrawing_renderer::get_image_for_question($this);
+    			if (qtype_freehanddrawing_renderer::isDataURLAValidDrawing($response['answer'], $bgImageArray[1], $bgImageArray[2])) {
     				return true;
     			}
     		}
@@ -73,7 +73,7 @@ class qtype_canvas_question extends question_graded_by_strategy implements quest
         if ($this->is_gradable_response($response)) {
             return '';
         }
-        return get_string('pleaseenterananswer', 'qtype_canvas');
+        return get_string('pleaseenterananswer', 'qtype_freehanddrawing');
     }
 
     public function is_same_response(array $prevresponse, array $newresponse) {
@@ -89,7 +89,7 @@ class qtype_canvas_question extends question_graded_by_strategy implements quest
     	return array('answer' => reset($this->answers)->answer);
     }
     public function get_right_answer_summary() {
-    	return get_string('no_correct_answer_summary', 'qtype_canvas');
+    	return get_string('no_correct_answer_summary', 'qtype_freehanddrawing');
     }
     public function compare_response_with_answer(array $response, question_answer $answer) {
 
@@ -98,7 +98,7 @@ class qtype_canvas_question extends question_graded_by_strategy implements quest
     		return false;
     	}
     	
-    	$matchPercentage = qtype_canvas_renderer::compare_drawings($answer->answer, $response['answer']);
+    	$matchPercentage = qtype_freehanddrawing_renderer::compare_drawings($answer->answer, $response['answer']);
     	
     	if (($this->threshold) <= $matchPercentage) {
     		$answer->fraction = 1;
@@ -113,7 +113,7 @@ class qtype_canvas_question extends question_graded_by_strategy implements quest
 
     public function check_file_access($qa, $options, $component, $filearea,
             $args, $forcedownload) {
-        if ($component == 'qtype_canvas' && $filearea == 'qtype_canvas_image_file') {
+        if ($component == 'qtype_freehanddrawing' && $filearea == 'qtype_freehanddrawing_image_file') {
             $question = $qa->get_question();                                                                                                                                
             $itemid = reset($args);                                                                                                                                         
             return ($itemid == $question->id);                                                                                                                            

@@ -15,10 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * canvas question renderer class.
+ * freehanddrawing question renderer class.
  *
  * @package	qtype
- * @subpackage canvas
+ * @subpackage freehanddrawing
  * @copyright ETHZ LET <jacob.shapiro@let.ethz.ch> 
  * @license	http://opensource.org/licenses/BSD-3-Clause
  */
@@ -27,19 +27,19 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Generates the output for canvas questions.
+ * Generates the output for freehanddrawing questions.
  *
  * @copyright  ETHZ LET <jacob.shapiro@let.ethz.ch>
  * @license	http://opensource.org/licenses/BSD-3-Clause
  */
-class qtype_canvas_renderer extends qtype_renderer {
+class qtype_freehanddrawing_renderer extends qtype_renderer {
 
 
 	
 	public static function requireTranslationsIntoJS() {
 		global $PAGE;
-		foreach (array_keys(get_string_manager()->load_component_strings('qtype_canvas', current_language())) as $string) {
-			$PAGE->requires->string_for_js($string, 'qtype_canvas');
+		foreach (array_keys(get_string_manager()->load_component_strings('qtype_freehanddrawing', current_language())) as $string) {
+			$PAGE->requires->string_for_js($string, 'qtype_freehanddrawing');
 		}
 	}
 	
@@ -192,30 +192,30 @@ class qtype_canvas_renderer extends qtype_renderer {
 			return html_writer::tag('div', '<h1>Unable to fetch canvas background image file');
 		}
 		
-		$canvas = "<div class=\"qtype_canvas_id_" . $question->id . "\">";
+		$canvas = "<div class=\"qtype_freehanddrawing_id_" . $question->id . "\">";
 		
 		if ($options->readonly) {
 			$readonlyCanvas = ' readonly-canvas';
 			$correctAnswer = reset($question->answers)->answer;
 			list($blendedImgDataURL, $matchPercentage) = self::compare_drawings($correctAnswer, $currentAnswer, true);
-			qtype_canvas_renderer::requireTranslationsIntoJS();
+			qtype_freehanddrawing_renderer::requireTranslationsIntoJS();
 			if ($options->correctness === 0) {
-				$this->page->requires->yui_module('moodle-qtype_canvas-form', 'Y.Moodle.qtype_canvas.form.init', array($question->id, $question->radius, $currentAnswer));
+				$this->page->requires->yui_module('moodle-qtype_freehanddrawing-form', 'Y.Moodle.qtype_freehanddrawing.form.init', array($question->id, $question->radius, $currentAnswer));
 			} else {
-				$this->page->requires->yui_module('moodle-qtype_canvas-form', 'Y.Moodle.qtype_canvas.form.init', array($question->id, $question->radius, $blendedImgDataURL));
+				$this->page->requires->yui_module('moodle-qtype_freehanddrawing-form', 'Y.Moodle.qtype_freehanddrawing.form.init', array($question->id, $question->radius, $blendedImgDataURL));
 			}
 			$fraction = ($matchPercentage /  ($question->threshold));
 			$feedbackimg = $this->feedback_image($fraction);
-			$canvas .= "<h1>".sprintf('%0.2f', $matchPercentage)."% ".get_string("out_of_necessary", "qtype_canvas")." ".sprintf('%0.2f', $question->threshold )."%.</h1><hr>" . $feedbackimg . "<hr>";
+			$canvas .= "<h1>".sprintf('%0.2f', $matchPercentage)."% ".get_string("out_of_necessary", "qtype_freehanddrawing")." ".sprintf('%0.2f', $question->threshold )."%.</h1><hr>" . $feedbackimg . "<hr>";
 		} else {
 			$readonlyCanvas = '';
-			$this->page->requires->yui_module('moodle-qtype_canvas-form', 'Y.Moodle.qtype_canvas.form.init', array($question->id, $question->radius));
-			$canvas .= '<img ALT="'.get_string("erase_canvas", "qtype_canvas").'" SRC="'.$CFG->wwwroot . '/question/type/canvas/pix/Eraser-icon.png" CLASS="qtype_canvas_eraser">';
-			$canvas .= "<textarea class=\"qtype_canvas_textarea\" name=\"$inputname\" id=\"qtype_canvas_textarea_id_".$question->id."\" rows=20 cols=50>$currentAnswer</textarea>";
+			$this->page->requires->yui_module('moodle-qtype_freehanddrawing-form', 'Y.Moodle.qtype_freehanddrawing.form.init', array($question->id, $question->radius));
+			$canvas .= '<img ALT="'.get_string("erase_canvas", "qtype_freehanddrawing").'" SRC="'.$CFG->wwwroot . '/question/type/freehanddrawing/pix/Eraser-icon.png" CLASS="qtype_freehanddrawing_eraser">';
+			$canvas .= "<textarea class=\"qtype_freehanddrawing_textarea\" name=\"$inputname\" id=\"qtype_freehanddrawing_textarea_id_".$question->id."\" rows=20 cols=50>$currentAnswer</textarea>";
 			
 		}
 
-		$canvas .= "<canvas class=\"qtype_canvas".$readonlyCanvas."\" width=\"".$bgimageArray[1]."\" height=\"".$bgimageArray[2]."\"style=\"background:url('$bgimageArray[0]')\"></canvas></div>";
+		$canvas .= "<canvas class=\"qtype_freehanddrawing".$readonlyCanvas."\" width=\"".$bgimageArray[1]."\" height=\"".$bgimageArray[2]."\"style=\"background:url('$bgimageArray[0]')\"></canvas></div>";
 		
 		
 		$questiontext = $question->format_questiontext($qa);
@@ -253,14 +253,14 @@ class qtype_canvas_renderer extends qtype_renderer {
 			return '';
 		}
 
-		return get_string('correctansweris', 'qtype_canvas', s($answer->answer));
+		return get_string('correctansweris', 'qtype_freehanddrawing', s($answer->answer));
 	}
 
 
 
 
     public static function get_image_for_question($question) {
-    	return self::get_image_for_files($question->contextid,  'qtype_canvas', 'qtype_canvas_image_file', $question->id);
+    	return self::get_image_for_files($question->contextid,  'qtype_freehanddrawing', 'qtype_freehanddrawing_image_file', $question->id);
     }
     
     public static function get_image_for_files($context, $component, $filearea, $itemid) {
@@ -293,7 +293,7 @@ class qtype_canvas_renderer extends qtype_renderer {
     	return null;
     }
     public static function isDataURLAValidDrawing($dataURL, $bgWidth, $bgHeight) {
-    	$imgData = base64_decode(qtype_canvas_renderer::strstr_after($dataURL, 'base64,'));
+    	$imgData = base64_decode(qtype_freehanddrawing_renderer::strstr_after($dataURL, 'base64,'));
     	$imgGDResource =  imagecreatefromstring($imgData);
     	if ($imgGDResource === FALSE) {
     		return false;

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="question/type/canvas/db" VERSION="20090305" COMMENT="XMLDB file for Moodle question/type/canvas"
+<XMLDB PATH="question/type/freehanddrawing/db" VERSION="20090305" COMMENT="XMLDB file for Moodle question/type/freehanddrawing"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../../lib/xmldb/xmldb.xsd"
 >
   <TABLES>
-    <TABLE NAME="qtype_canvas" COMMENT="Options for canvas qtype">
+    <TABLE NAME="qtype_freehanddrawing" COMMENT="Options for Freehand Drawing qtype">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="questionid"/>
         <FIELD NAME="questionid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="Foreign key references question.id." PREVIOUS="id" NEXT="threshold"/>

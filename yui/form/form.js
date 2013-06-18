@@ -1,33 +1,33 @@
 /**
  * This is JavaScript code that handles drawing on mouse events and painting pre-existing drawings.
  * @package    qtype
- * @subpackage canvas
+ * @subpackage freehanddrawing
  * @copyright  ETHZ LET <jacob.shapiro@let.ethz.ch>
  * @license    http://opensource.org/licenses/BSD-3-Clause
  */
 
-YUI.add('moodle-qtype_canvas-form', function(Y) {
+YUI.add('moodle-qtype_freehanddrawing-form', function(Y) {
 	var CSS = {
 	},
 	SELECTORS = {
-			GENERICCANVAS: 'canvas[class="qtype_canvas"]',
-			READONLYCANVAS: 'canvas[class="qtype_canvas readonly-canvas"]',
-			FILEPICKER: '#id_qtype_canvas_image_file',
-			FILEPICKERFIELDSET: 'fieldset[id$=qtype_canvas_drawing_background_image]',
-			FILEPICKERFIELDSETANOTHER: 'fieldset[id$=qtype_canvas_drawing_background_image_selected]',
+			GENERICCANVAS: 'canvas[class="qtype_freehanddrawing_canvas"]',
+			READONLYCANVAS: 'canvas[class="qtype_freehanddrawing_canvas readonly-canvas"]',
+			FILEPICKER: '#id_qtype_freehanddrawing_image_file',
+			FILEPICKERFIELDSET: 'fieldset[id$=qtype_freehanddrawing_drawing_background_image]',
+			FILEPICKERFIELDSETANOTHER: 'fieldset[id$=qtype_freehanddrawing_drawing_background_image_selected]',
 			DRAWINGRADIUS: '#id_radius',
-			CHOOSEFILEBUTTON: 'input[name="qtype_canvas_image_filechoose"]',
-			CHOOSEANOTHERFILEBUTTON: 'input[name="qtype_canvas_image_filechoose_another"]',
-			ERASERBUTTON: 'img[class="qtype_canvas_eraser"]',
-			CONTAINERDIV: 'div[class="qtype_canvas_container_div"]',
-			NOBACKGROUNDIMAGESELECTEDYET: 'div[class="qtype_canvas_no_background_image_selected_yet"]',
-			CANVASTEXTAREAEDITMODE: 'textarea[name="qtype_canvas_textarea_id_0"]',
-			CANVASTEXTAREATESTMODE: 'textarea[id="qtype_canvas_textarea_id_',
+			CHOOSEFILEBUTTON: 'input[name="qtype_freehanddrawing_image_filechoose"]',
+			CHOOSEANOTHERFILEBUTTON: 'input[name="qtype_freehanddrawing_image_filechoose_another"]',
+			ERASERBUTTON: 'img[class="qtype_freehanddrawing_eraser"]',
+			CONTAINERDIV: 'div[class="qtype_freehanddrawing_container_div"]',
+			NOBACKGROUNDIMAGESELECTEDYET: 'div[class="qtype_freehanddrawing_no_background_image_selected_yet"]',
+			CANVASTEXTAREAEDITMODE: 'textarea[name="qtype_freehanddrawing_textarea_id_0"]',
+			CANVASTEXTAREATESTMODE: 'textarea[id="qtype_freehanddrawing_textarea_id_',
 	};
-	Y.namespace('Moodle.qtype_canvas.form');
+	Y.namespace('Moodle.qtype_freehanddrawing.form');
 
 
-	Y.Moodle.qtype_canvas.form = {
+	Y.Moodle.qtype_freehanddrawing.form = {
 
 
 			canvasContext: new Array(),
@@ -101,13 +101,13 @@ YUI.add('moodle-qtype_canvas-form', function(Y) {
 			canvasNode = Y.one(SELECTORS.GENERICCANVAS);
 		} else {
 			Y.all(SELECTORS.GENERICCANVAS).each(function(node) {
-				if (node.ancestor().getAttribute('class') == 'qtype_canvas_id_' + questionID) {
+				if (node.ancestor().getAttribute('class') == 'qtype_freehanddrawing_id_' + questionID) {
 					canvasNode = node;
 				}
 			}.bind(this));
 		}
 		if (this.is_canvas_empty(questionID) == false) {
-			if (confirm(M.util.get_string('are_you_sure_you_want_to_erase_the_canvas', 'qtype_canvas')) == true) {
+			if (confirm(M.util.get_string('are_you_sure_you_want_to_erase_the_canvas', 'qtype_freehanddrawing')) == true) {
 				canvasNode.getDOMNode().width = canvasNode.getDOMNode().width;
 				this.create_canvas_context(questionID, false);
 			}
@@ -116,7 +116,7 @@ YUI.add('moodle-qtype_canvas-form', function(Y) {
 	
 	draw_correct_answer: function(questionID, correctAnswer) {
 		Y.all(SELECTORS.READONLYCANVAS).each(function(node) {
-			if (node.ancestor().getAttribute('class') == 'qtype_canvas_id_' + questionID) {
+			if (node.ancestor().getAttribute('class') == 'qtype_freehanddrawing_id_' + questionID) {
 				canvasNode = node;
 			}
 		}.bind(this));
@@ -139,7 +139,7 @@ YUI.add('moodle-qtype_canvas-form', function(Y) {
 	},
 	choose_new_image_file_click: function(e) {
 		if (this.is_canvas_empty(0) == false) {
-			if (confirm(M.util.get_string('are_you_sure_you_want_to_pick_a_new_bgimage', 'qtype_canvas')) == false) {
+			if (confirm(M.util.get_string('are_you_sure_you_want_to_pick_a_new_bgimage', 'qtype_freehanddrawing')) == false) {
 				Y.one('.file-picker.fp-generallayout').one('.yui3-button.yui3-button-close').simulate("click");	
 			}
 		}
@@ -161,7 +161,7 @@ YUI.add('moodle-qtype_canvas-form', function(Y) {
 			canvasNode = Y.one(SELECTORS.GENERICCANVAS);
 		} else {
 			Y.all(SELECTORS.GENERICCANVAS).each(function(node) {
-				if (node.ancestor().getAttribute('class') == 'qtype_canvas_id_' + questionID) {
+				if (node.ancestor().getAttribute('class') == 'qtype_freehanddrawing_id_' + questionID) {
 					canvasNode = node;
 				}
 			}.bind(this));
@@ -172,7 +172,6 @@ YUI.add('moodle-qtype_canvas-form', function(Y) {
 		return true;
 	},
 	filepicker_change: function(e) {
-		// The clicked qtype_canvas can be found at e.currentTarget.
 		
 		if (this.edit_mode == true) {
 			Y.one(SELECTORS.FILEPICKERFIELDSET).setStyles({display: 'block'});
@@ -180,7 +179,7 @@ YUI.add('moodle-qtype_canvas-form', function(Y) {
 		}
 		
 		
-		var imgURL = Y.one('#id_qtype_canvas_image_file').ancestor().one('div.filepicker-filelist a').get('href');
+		var imgURL = Y.one('#id_qtype_freehanddrawing_image_file').ancestor().one('div.filepicker-filelist a').get('href');
 		var image = new Image();
 		image.src = imgURL;
 		image.onload = function () {
@@ -203,7 +202,7 @@ YUI.add('moodle-qtype_canvas-form', function(Y) {
 			canvasNode = Y.one(SELECTORS.GENERICCANVAS);
 		} else {
 			Y.all(SELECTORS.GENERICCANVAS).each(function(node) {
-				if (node.ancestor().getAttribute('class') == 'qtype_canvas_id_' + questionID) {
+				if (node.ancestor().getAttribute('class') == 'qtype_freehanddrawing_id_' + questionID) {
 					canvasNode = node;
 				}
 			}.bind(this));
@@ -232,7 +231,7 @@ YUI.add('moodle-qtype_canvas-form', function(Y) {
 	},
 	drawing_radius_change: function(e) {
 		if (this.is_canvas_empty(0) == false) {
-			if (confirm(M.util.get_string('are_you_sure_you_want_to_change_the_drawing_radius', 'qtype_canvas')) == true) {
+			if (confirm(M.util.get_string('are_you_sure_you_want_to_change_the_drawing_radius', 'qtype_freehanddrawing')) == true) {
 				Y.one(SELECTORS.GENERICCANVAS).getDOMNode().width = Y.one(SELECTORS.GENERICCANVAS).getDOMNode().width;
 				this.create_canvas_context(0, false);
 			} else {
@@ -293,10 +292,10 @@ YUI.add('moodle-qtype_canvas-form', function(Y) {
 },
 
 	canvas_get_question_id: function(node) {
-		if (node.ancestor().getAttribute('class').indexOf('qtype_canvas_id') == -1) {
+		if (node.ancestor().getAttribute('class').indexOf('qtype_freehanddrawing_canvas_id') == -1) {
 			return 0;
 		} else {
-			return node.ancestor().getAttribute('class').replace(/qtype_canvas_id_/gi, '');
+			return node.ancestor().getAttribute('class').replace(/qtype_freehanddrawing_canvas_id_/gi, '');
 		}
 	},
 };

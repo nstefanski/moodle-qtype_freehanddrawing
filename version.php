@@ -15,17 +15,17 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * canvas question type version information.
+ * freehanddrawing question type version information.
  *
  * @package    qtype
- * @subpackage canvas
+ * @subpackage freehanddrawing
  * @copyright  ETHZ LET <jacob.shapiro@let.ethz.ch>
  * @license    http://opensource.org/licenses/BSD-3-Clause
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'qtype_canvas';
+$plugin->component = 'qtype_freehanddrawing';
 $plugin->version   = 2013061100;
 
 $plugin->requires  = 2011102700;

@@ -19,7 +19,7 @@
  *
  * @since      2.0
  * @package    qtype
- * @subpackage canvas 
+ * @subpackage freehanddrawing 
  * @copyright  ETHZ LET <jacob.shapiro@let.ethz.ch>
  * @license    http://opensource.org/licenses/BSD-3-Clause
  */
@@ -29,7 +29,7 @@ defined('MOODLE_INTERNAL') || die();
 
 
 /**
- * Checks file access for canvas questions.
+ * Checks file access for freehanddrawing questions.
  */
 function qtype_canvas_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options=array()) {
     global $CFG;
