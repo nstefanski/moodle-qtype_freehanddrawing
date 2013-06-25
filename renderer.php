@@ -20,7 +20,7 @@
  * @package	qtype
  * @subpackage freehanddrawing
  * @copyright ETHZ LET <jacob.shapiro@let.ethz.ch> 
- * @license	http://opensource.org/licenses/BSD-3-Clause
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 
