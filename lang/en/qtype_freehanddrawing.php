@@ -15,10 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Strings for component 'qtype_canvas', language 'en', branch 'MOODLE_20_STABLE'
+ * Strings for component 'qtype_freehanddrawing', language 'en', branch 'MOODLE_20_STABLE'
  *
  * @package    qtype
- * @subpackage canvas
+ * @subpackage freehanddrawing
  * @copyright  ETHZ LET <jacob.shapiro@let.ethz.ch>
  * @license  http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

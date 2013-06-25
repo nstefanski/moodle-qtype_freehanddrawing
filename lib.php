@@ -31,8 +31,8 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Checks file access for freehanddrawing questions.
  */
-function qtype_canvas_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options=array()) {
+function qtype_freehanddrawing_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options=array()) {
     global $CFG;
     require_once($CFG->libdir . '/questionlib.php');
-    question_pluginfile($course, $context, 'qtype_canvas', $filearea, $args, $forcedownload, $options);
+    question_pluginfile($course, $context, 'qtype_freehanddrawing', $filearea, $args, $forcedownload, $options);
 }
