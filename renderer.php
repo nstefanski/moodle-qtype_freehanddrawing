@@ -97,41 +97,134 @@ class qtype_freehanddrawing_renderer extends qtype_renderer {
 		$studentOnlyPixels = 0;
 		
 		
-		for ($x = 0; $x < $width; $x++) {
-			for ($y = 0; $y < $height; $y++) {
-				$rgbCorrectAns = imagecolorat($correctAnswerImg, $x, $y);
-				$rgbCorrectAnsArray = array(($rgbCorrectAns >> 16) & 0xFF, ($rgbCorrectAns >> 8) & 0xFF, $rgbCorrectAns & 0xFF);
-				if (!$onlyShowCorrectAnswer) {
-					// VALIDATE STUDENT ANSWER
-					$rgbCurrentAns = imagecolorat($currentAnswerImg, $x, $y);
-					$rgbCurrentAnsArray = array(($rgbCurrentAns >> 16) & 0xFF, ($rgbCurrentAns >> 8) & 0xFF, $rgbCurrentAns & 0xFF);
-					if (self::isBlue($rgbCorrectAnsArray)  && self::isBlue($rgbCurrentAnsArray)) {
-						$matchingPixels++;
-						if ($createBlendedImg ===  true) {
+		// *************
+		// WARNING: THE FOLLOWING IS SPAHGETTI CODE FOR OPTIMIZATION PURPOSES. SORRY.
+		// *************
+		
+		
+		if (!$onlyShowCorrectAnswer) {
+			if ($createBlendedImg ===  true) {
+				for ($x = 0; $x < $width; $x++) {
+					for ($y = 0; $y < $height; $y++) {
+						if ((((imagecolorat($correctAnswerImg, $x, $y) & 0xFF) == 255)) && (((imagecolorat($currentAnswerImg, $x, $y) & 0xFF) == 255))) {
+
+							$matchingPixels++;
+
 							imagesetpixel($blendedImg, $x, $y, $green);
-						}
-					} else if (self::isBlue($rgbCorrectAnsArray)  && !self::isBlue($rgbCurrentAnsArray)) {
-						$teacherOnlyPixels++;
-						if ($createBlendedImg ===  true) {
+
+						} else if (((imagecolorat($correctAnswerImg, $x, $y) & 0xFF) == 255) && !((imagecolorat($currentAnswerImg, $x, $y) & 0xFF) == 255)) {
+
+							$teacherOnlyPixels++;
+
 							imagesetpixel($blendedImg, $x, $y, $blue);
-						}
-					} else if (!self::isBlue($rgbCorrectAnsArray)  && self::isBlue($rgbCurrentAnsArray)) {
-						$studentOnlyPixels++;
-						if ($createBlendedImg ===  true) {
+
+						} else if (!((imagecolorat($correctAnswerImg, $x, $y) & 0xFF) == 255) && ((imagecolorat($currentAnswerImg, $x, $y) & 0xFF) == 255)) {
+
+							$studentOnlyPixels++;
+
 							imagesetpixel($blendedImg, $x, $y, $red);
+
 						}
-					}
-				} else {
-					// ONLY SHOW CORRECT ANSWER -- NO INPUT FROM USER
-					if (self::isBlue($rgbCorrectAnsArray)) {
-						$teacherOnlyPixels++;
-						if ($createBlendedImg ===  true) {
-							imagesetpixel($blendedImg, $x, $y, $blue);
-						}
+
 					}
 				}
+			} else {
+				// DO NO CREATE BLENDED IMAGE
+				for ($x = 0; $x < $width; $x++) {
+					for ($y = 0; $y < $height; $y++) {
+						if ((((imagecolorat($correctAnswerImg, $x, $y) & 0xFF) == 255)) && (((imagecolorat($currentAnswerImg, $x, $y) & 0xFF) == 255))) {
+
+							$matchingPixels++;
+
+						} else if (((imagecolorat($correctAnswerImg, $x, $y) & 0xFF) == 255) && !((imagecolorat($currentAnswerImg, $x, $y) & 0xFF) == 255)) {
+
+							$teacherOnlyPixels++;
+
+						} else if (!((imagecolorat($correctAnswerImg, $x, $y) & 0xFF) == 255) && ((imagecolorat($currentAnswerImg, $x, $y) & 0xFF) == 255)) {
+
+							$studentOnlyPixels++;
+						}
+
+					}
+				}
+				// --- DO NOT CREATE BLENDED IMAGE
 			}
+		} else {
+			if ($createBlendedImg ===  true) {
+				for ($x = 0; $x < $width; $x++) {
+					for ($y = 0; $y < $height; $y++) {
+						// ONLY SHOW CORRECT ANSWER -- NO INPUT FROM USER
+						if ((imagecolorat($correctAnswerImg, $x, $y) & 0xFF) == 255) {
+
+							$teacherOnlyPixels++;
+
+							imagesetpixel($blendedImg, $x, $y, $blue);
+
+						}
+
+					}
+				}
+			} else {
+				// DO NOT CREATE BLENDED IMAGE
+				for ($x = 0; $x < $width; $x++) {
+					for ($y = 0; $y < $height; $y++) {
+						// ONLY SHOW CORRECT ANSWER -- NO INPUT FROM USER
+						if ((imagecolorat($correctAnswerImg, $x, $y) & 0xFF) == 255) {
+
+							$teacherOnlyPixels++;
+						}
+
+					}
+				}
+				// --- DO NOT CREATE BLENDED IMAGE
+			}
+
 		}
+
+
+// 		for ($x = 0; $x < $width; $x++) {
+// 			for ($y = 0; $y < $height; $y++) {
+// 				$rgbCorrectAns = imagecolorat($correctAnswerImg, $x, $y);
+// 				//$rgbCorrectAnsArray = array(($rgbCorrectAns >> 16) & 0xFF, ($rgbCorrectAns >> 8) & 0xFF, $rgbCorrectAns & 0xFF);
+// 				$rgbCorrectAnsArray = array(0, 0, $rgbCorrectAns & 0xFF);
+// 				if (!$onlyShowCorrectAnswer) {
+// 					// VALIDATE STUDENT ANSWER
+// 					$rgbCurrentAns = imagecolorat($currentAnswerImg, $x, $y);
+// 					//$rgbCurrentAnsArray = array(($rgbCurrentAns >> 16) & 0xFF, ($rgbCurrentAns >> 8) & 0xFF, $rgbCurrentAns & 0xFF);
+// 					$rgbCurrentAnsArray = array(0, 0, $rgbCurrentAns & 0xFF);
+// 					if ((($rgbCorrectAnsArray[2] == 255/* && $rgbCorrectAnsArray[0] == 0 && $rgbCorrectAnsArray[1] == 0*/)) && (($rgbCurrentAnsArray[2] == 255/* && $rgbCurrentAnsArray[0] == 0 && $rgbCurrentAnsArray[1] == 0*/))) {
+// 					 //if (self::isBlue($rgbCorrectAnsArray)  && self::isBlue($rgbCurrentAnsArray)) {
+// 						$matchingPixels++;
+// 						if ($createBlendedImg ===  true) {
+// 							imagesetpixel($blendedImg, $x, $y, $green);
+// 						}
+// 					} else if (($rgbCorrectAnsArray[2] == 255/* && $rgbCorrectAnsArray[0] == 0 && $rgbCorrectAnsArray[1] == 0*/) && !($rgbCurrentAnsArray[2] == 255/* && $rgbCurrentAnsArray[0] == 0 && $rgbCurrentAnsArray[1] == 0*/)) {
+// 					//} else if (self::isBlue($rgbCorrectAnsArray)  && !self::isBlue($rgbCurrentAnsArray)) {
+// 						$teacherOnlyPixels++;
+// 						if ($createBlendedImg ===  true) {
+// 							imagesetpixel($blendedImg, $x, $y, $blue);
+// 						}
+// 					} else if (!($rgbCorrectAnsArray[2] == 255/* && $rgbCorrectAnsArray[0] == 0 && $rgbCorrectAnsArray[1] == 0*/) && ($rgbCurrentAnsArray[2] == 255/* && $rgbCurrentAnsArray[0] == 0 && $rgbCurrentAnsArray[1] == 0*/)) {
+// 					//} else if (!self::isBlue($rgbCorrectAnsArray)  && self::isBlue($rgbCurrentAnsArray)) {
+// 						$studentOnlyPixels++;
+// 						if ($createBlendedImg ===  true) {
+// 							imagesetpixel($blendedImg, $x, $y, $red);
+// 						}
+// 					}
+// 				} else {
+// 					// ONLY SHOW CORRECT ANSWER -- NO INPUT FROM USER
+// 					if ($rgbCorrectAnsArray[2] == 255/* && $rgbCorrectAnsArray[0] == 0 && $rgbCorrectAnsArray[1] == 0*/) {
+// 					//if (self::isBlue($rgbCorrectAnsArray)) {
+// 						$teacherOnlyPixels++;
+// 						if ($createBlendedImg ===  true) {
+// 							imagesetpixel($blendedImg, $x, $y, $blue);
+// 						}
+// 					}
+// 				}
+// 			}
+// 		}
+		
+		
 		imagedestroy($correctAnswerImg);
 		
 		if (!$onlyShowCorrectAnswer) {
