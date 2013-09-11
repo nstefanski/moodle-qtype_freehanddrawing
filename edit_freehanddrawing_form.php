@@ -141,7 +141,7 @@ class qtype_freehanddrawing_edit_form extends question_edit_form {
         $mform->addElement('html', '<div class="fitem"><div class="fitemtitle">' . 
         		get_string("drawanswer", "qtype_freehanddrawing").'</div><div class="felement"><div class="qtype_freehanddrawing_no_background_image_selected_yet" '.$noBackgroundImageSelectedYetStyle.'>' . 
         		get_string('nobackgroundimageselectedyet', 'qtype_freehanddrawing') . 
-        		'</div><div class="qtype_freehanddrawing_container_div" '.$eraserHTMLParams.'><img ALT="'.get_string("erase_canvas", "qtype_freehanddrawing").'" SRC="'.$CFG->wwwroot . '/question/type/freehanddrawing/pix/Eraser-icon.png" CLASS="qtype_freehanddrawing_eraser" ID="qtype_freehanddrawing_eraser_id_0" '.$eraserHTMLParams.'><canvas class="qtype_freehanddrawing_canvas" '.$canvasHTMLParams.'>');
+        		'</div><div class="qtype_freehanddrawing_container_div" '.$eraserHTMLParams.'><img ALT="'.get_string("erase_canvas", "qtype_freehanddrawing").'" SRC="'.$CFG->wwwroot . '/question/type/freehanddrawing/pix/Empty-frame.png" CLASS="qtype_freehanddrawing_eraser" ID="qtype_freehanddrawing_eraser_id_0" '.$eraserHTMLParams.'><img ALT="'.get_string("eraser_tool", "qtype_freehanddrawing").'" SRC="'.$CFG->wwwroot . '/question/type/freehanddrawing/pix/Eraser-icon.png" CLASS="qtype_freehanddrawing_eraser_tool" ID="qtype_freehanddrawing_eraser_tool_id_0" '.$eraserHTMLParams.'><canvas class="qtype_freehanddrawing_canvas" '.$canvasHTMLParams.'>');
 
         $this->add_interactive_settings();
 

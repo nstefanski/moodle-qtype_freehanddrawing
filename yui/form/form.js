@@ -19,6 +19,7 @@ YUI.add('moodle-qtype_freehanddrawing-form', function(Y) {
 			CHOOSEFILEBUTTON: 'input[name="qtype_freehanddrawing_image_filechoose"]',
 			CHOOSEANOTHERFILEBUTTON: 'input[name="qtype_freehanddrawing_image_filechoose_another"]',
 			ERASERBUTTON: 'img[class="qtype_freehanddrawing_eraser"]',
+			ERASERTOOLBUTTON: 'img[class="qtype_freehanddrawing_eraser_tool"]',
 			CONTAINERDIV: 'div[class="qtype_freehanddrawing_container_div"]',
 			NOBACKGROUNDIMAGESELECTEDYET: 'div[class="qtype_freehanddrawing_no_background_image_selected_yet"]',
 			CANVASTEXTAREAEDITMODE: 'textarea[name="qtype_freehanddrawing_textarea_id_0"]',
@@ -32,11 +33,13 @@ YUI.add('moodle-qtype_freehanddrawing-form', function(Y) {
 
 			canvasContext: new Array(),
 			drawingRadius: new Array(),
+            eraserToolOn: new Array(),
 			emptyCanvasDataURL: new Array(),
 			
 			filepicker_change_sub: null,
 			choose_new_image_file_click_sub: null,
 			eraser_click_sub: null,
+            eraser_tool_click_sub: null,
 			canvas_mousedown_sub: null,
 			canvas_mouseup_sub: null,
 			canvas_mouseout_sub: null,
@@ -55,6 +58,7 @@ YUI.add('moodle-qtype_freehanddrawing-form', function(Y) {
 						// A questionID should actually always be defined (even when it's a newly created question, in which case the question ID should be given as zero)
 						// But better safe than sorry
 						this.drawingRadius[questionID] = drawingRadius;
+                        this.eraserToolOn[questionID] = false;
 						this.emptyCanvasDataURL[questionID] = Y.one(SELECTORS.GENERICCANVAS).getDOMNode().toDataURL();
 						this.create_canvas_context(questionID);
 						if (questionID == 0) {
@@ -79,6 +83,9 @@ YUI.add('moodle-qtype_freehanddrawing-form', function(Y) {
 					if(!this.eraser_click_sub) { 
 						this.eraser_click_sub =  Y.delegate('mouseup', this.eraser_click, Y.config.doc, SELECTORS.ERASERBUTTON, this);
 					}
+                    if (!this.eraser_tool_click_sub) {
+						this.eraser_tool_click_sub =  Y.delegate('mouseup', this.eraser_tool_click, Y.config.doc, SELECTORS.ERASERTOOLBUTTON, this);
+                    }
 					if(!this.canvas_mousedown_sub) { 
 						this.canvas_mousedown_sub = Y.delegate('mousedown', this.canvas_mousedown,  Y.config.doc, SELECTORS.GENERICCANVAS, this); 
 					}
@@ -114,6 +121,19 @@ YUI.add('moodle-qtype_freehanddrawing-form', function(Y) {
 		}
 	},
 	
+	eraser_tool_click: function(e) {
+		questionID = this.canvas_get_question_id(e.currentTarget);
+        if (this.eraserToolOn[questionID] == false) {
+            this.eraserToolOn[questionID] = true;
+            Y.one(SELECTORS.ERASERTOOLBUTTON).set('src', M.cfg.wwwroot + '/question/type/freehanddrawing/pix/Eraser-icon-active.png');
+            this.canvasContext[questionID].globalCompositeOperation = 'destination-out';
+        } else {
+            this.eraserToolOn[questionID] = false;
+            Y.one(SELECTORS.ERASERTOOLBUTTON).set('src', M.cfg.wwwroot + '/question/type/freehanddrawing/pix/Eraser-icon.png');
+            this.canvasContext[questionID].globalCompositeOperation = 'source-over';
+        }
+	},
+
 	draw_correct_answer: function(questionID, correctAnswer) {
 		Y.all(SELECTORS.READONLYCANVAS).each(function(node) {
 			if (node.ancestor().getAttribute('class') == 'qtype_freehanddrawing_id_' + questionID) {
@@ -185,6 +205,7 @@ YUI.add('moodle-qtype_freehanddrawing-form', function(Y) {
 		image.onload = function () {
 			Y.one(SELECTORS.GENERICCANVAS).setStyles({backgroundImage: "url('" + imgURL + "')", display: 'block'});
 			Y.one(SELECTORS.ERASERBUTTON).setStyles({display: 'block'});
+			Y.one(SELECTORS.ERASERTOOLBUTTON).setStyles({display: 'block'});
 			Y.one(SELECTORS.CONTAINERDIV).setStyles({display: 'inline-block'});
 			Y.one(SELECTORS.NOBACKGROUNDIMAGESELECTEDYET).setStyles({display: 'none'});
 			
@@ -213,8 +234,9 @@ YUI.add('moodle-qtype_freehanddrawing-form', function(Y) {
 		this.canvasContext[questionID].lineJoin = 'round';
 		this.canvasContext[questionID].lineCap = 'round';
 		this.canvasContext[questionID].strokeStyle = 'blue';
-		
-		textarea = this.canvas_get_textarea(canvasNode);
+        this.canvasContext[questionID].globalCompositeOperation = 'source-over';
+
+        textarea = this.canvas_get_textarea(canvasNode);
 		if (textarea != null) {
 			if (applyTextArea == false) {
 				textarea.set('value', '');

@@ -303,7 +303,8 @@ class qtype_freehanddrawing_renderer extends qtype_renderer {
 		} else {
 			$readonlyCanvas = '';
 			$this->page->requires->yui_module('moodle-qtype_freehanddrawing-form', 'Y.Moodle.qtype_freehanddrawing.form.init', array($question->id, $question->radius));
-			$canvas .= '<img ALT="'.get_string("erase_canvas", "qtype_freehanddrawing").'" SRC="'.$CFG->wwwroot . '/question/type/freehanddrawing/pix/Eraser-icon.png" CLASS="qtype_freehanddrawing_eraser">';
+			$canvas .= '<img ALT="'.get_string("erase_canvas", "qtype_freehanddrawing").'" SRC="'.$CFG->wwwroot . '/question/type/freehanddrawing/pix/Empty-frame.png" CLASS="qtype_freehanddrawing_eraser">';
+            $canvas .= '<img ALT="'.get_string("eraser_tool", "qtype_freehanddrawing").'" SRC="'.$CFG->wwwroot . '/question/type/freehanddrawing/pix/Eraser-icon.png" CLASS="qtype_freehanddrawing_eraser_tool">';
 			$canvas .= "<textarea class=\"qtype_freehanddrawing_textarea\" name=\"$inputname\" id=\"qtype_freehanddrawing_textarea_id_".$question->id."\" rows=20 cols=50>$currentAnswer</textarea>";
 			
 		}

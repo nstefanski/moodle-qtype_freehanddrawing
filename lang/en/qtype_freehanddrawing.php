@@ -55,3 +55,4 @@ $string['no_response_summary'] = 'No response summary';
 $string['no_correct_answer_summary'] = 'No correct answer summary for freehand drawing question types.';
 $string['out_of_necessary'] = 'out of necessary';
 $string['selected_background_image_filename'] = 'Selected background image';
+$string['eraser_tool'] = 'Eraser Tool';
