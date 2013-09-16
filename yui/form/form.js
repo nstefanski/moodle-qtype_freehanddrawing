@@ -123,13 +123,24 @@ YUI.add('moodle-qtype_freehanddrawing-form', function(Y) {
 	
 	eraser_tool_click: function(e) {
 		questionID = this.canvas_get_question_id(e.currentTarget);
+		if (questionID == 0) {
+			canvasNode = Y.one(SELECTORS.GENERICCANVAS);
+		} else {
+			Y.all(SELECTORS.GENERICCANVAS).each(function(node) {
+				if (node.ancestor().getAttribute('class') == 'qtype_freehanddrawing_id_' + questionID) {
+					canvasNode = node;
+				}
+			}.bind(this));
+		}
         if (this.eraserToolOn[questionID] == false) {
             this.eraserToolOn[questionID] = true;
             Y.one(SELECTORS.ERASERTOOLBUTTON).set('src', M.cfg.wwwroot + '/question/type/freehanddrawing/pix/Eraser-icon-active.png');
+		    canvasNode.setStyles({ cursor: "url('" + M.cfg.wwwroot + '/question/type/freehanddrawing/pix/Eraser.cur' + "'), default", });
             this.canvasContext[questionID].globalCompositeOperation = 'destination-out';
         } else {
             this.eraserToolOn[questionID] = false;
             Y.one(SELECTORS.ERASERTOOLBUTTON).set('src', M.cfg.wwwroot + '/question/type/freehanddrawing/pix/Eraser-icon.png');
+		    canvasNode.setStyles({ cursor: "url('" + M.cfg.wwwroot + '/question/type/freehanddrawing/pix/Brush.cur' + "'), default", });
             this.canvasContext[questionID].globalCompositeOperation = 'source-over';
         }
 	},
@@ -228,7 +239,7 @@ YUI.add('moodle-qtype_freehanddrawing-form', function(Y) {
 				}
 			}.bind(this));
 		}
-		
+		canvasNode.setStyles({ cursor: "url('" + M.cfg.wwwroot + '/question/type/freehanddrawing/pix/Brush.cur' + "'), default", });
 		this.canvasContext[questionID] = canvasNode.getDOMNode().getContext('2d');
 		this.canvasContext[questionID].lineWidth = this.get_drawing_radius(questionID);
 		this.canvasContext[questionID].lineJoin = 'round';
@@ -264,6 +275,10 @@ YUI.add('moodle-qtype_freehanddrawing-form', function(Y) {
 		}
 	},
 	canvas_mousedown: function(e) {
+        // --- To prevent the cursor from changing into text-edit mode: http://stackoverflow.com/questions/2659999/html5-canvas-hand-cursor-problems ---
+        e.preventDefault();
+        e.stopPropagation();
+        // -----------------------
 		questionID = this.canvas_get_question_id(e.currentTarget);
 		this.canvasContext[questionID].beginPath();
 		var offset = e.currentTarget.getXY();

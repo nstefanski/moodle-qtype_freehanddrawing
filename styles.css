@@ -26,7 +26,6 @@ input[type="submit"]:disabled {
     margin-right: auto; 
     margin-top:5px; 
     border: 1px solid black; 
-    cursor: crosshair;
     display: block;
       -moz-user-select: none;
   -khtml-user-select: none;
@@ -34,7 +33,6 @@ input[type="submit"]:disabled {
   user-select: none;
 }
 .qtype_freehanddrawing_eraser {
-	cursor: pointer;
 	text-align: left;
 	width: 32px;
 	height: 32px;
@@ -42,7 +40,6 @@ input[type="submit"]:disabled {
     float: left;
 }
 .qtype_freehanddrawing_eraser_tool {
-	cursor: pointer;
 	text-align: left;
 	width: 32px;
 	height: 32px;
