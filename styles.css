@@ -41,7 +41,7 @@ input[type="submit"]:disabled {
 }
 .qtype_freehanddrawing_eraser_tool {
 	text-align: left;
-	width: 32px;
+	width: 67px;
 	height: 32px;
 	display: block;
 }
