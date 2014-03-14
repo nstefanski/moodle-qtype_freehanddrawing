@@ -52,10 +52,10 @@ class backup_qtype_freehanddrawing_plugin extends backup_qtype_plugin {
         $this->add_question_question_answers($pluginwrapper);
 
         // This qtype uses standard freehanddrawing units, add them here.
-        $this->add_question_freehanddrawing_units($pluginwrapper);
+        //$this->add_question_freehanddrawing_units($pluginwrapper);
 
         // This qtype uses standard freehanddrawing options, add them here.
-        $this->add_question_freehanddrawing_options($pluginwrapper);
+        //$this->add_question_freehanddrawing_options($pluginwrapper);
 
         // Now create the qtype own structures.
         $freehanddrawingrecords = new backup_nested_element('freehanddrawing_records');
@@ -67,11 +67,22 @@ class backup_qtype_freehanddrawing_plugin extends backup_qtype_plugin {
         $freehanddrawingrecords->add_child($freehanddrawingrecord);
 
         // Set source to populate the data.
-        $freehanddrawingrecord->set_source_table('question_freehanddrawing',
-                array('question' => backup::VAR_PARENTID));
+        $freehanddrawingrecord->set_source_table('qtype_freehanddrawing',
+                array('questionid' => backup::VAR_PARENTID));
 
         // Don't need to annotate ids nor files.
 
         return $plugin;
     }
+    /**
+     * Returns one array with filearea => mappingname elements for the qtype.
+     *
+     * Used by {@link get_components_and_fileareas} to know about all the qtype
+     * files to be processed both in backup and restore.
+     */
+    public static function get_qtype_fileareas() {
+    	return array(
+    			'qtype_freehanddrawing_image_file' => 'qtype_freehanddrawing');
+    }
+    
 }

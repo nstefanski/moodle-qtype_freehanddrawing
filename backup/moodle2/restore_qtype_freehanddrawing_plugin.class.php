@@ -45,8 +45,8 @@ class restore_qtype_freehanddrawing_plugin extends restore_qtype_plugin {
         $this->add_question_question_answers($paths);
 
         // This qtype uses question_freehanddrawing_options and question_freehanddrawing_units, add them.
-        $this->add_question_freehanddrawing_options($paths);
-        $this->add_question_freehanddrawing_units($paths);
+        //$this->add_question_freehanddrawing_options($paths);
+        //$this->add_question_freehanddrawing_units($paths);
 
         // Add own qtype stuff.
         $elename = 'freehanddrawing';
@@ -66,8 +66,8 @@ class restore_qtype_freehanddrawing_plugin extends restore_qtype_plugin {
         $oldid = $data->id;
 
         // Detect if the question is created or mapped.
-        $oldquestionid   = $this->get_old_parentid('question');
-        $newquestionid   = $this->get_new_parentid('question');
+        $oldquestionid   = $this->get_old_parentid('questionid');
+        $newquestionid   = $this->get_new_parentid('questionid');
         $questioncreated = $this->get_mappingid('question_created', $oldquestionid) ? true : false;
 
         // If the question has been created by restore, we need to create its
@@ -77,7 +77,7 @@ class restore_qtype_freehanddrawing_plugin extends restore_qtype_plugin {
             $data->question = $newquestionid;
             $data->answer = $this->get_mappingid('question_answer', $data->answer);
             // Insert record.
-            $newitemid = $DB->insert_record('question_freehanddrawing', $data);
+            $newitemid = $DB->insert_record('qtype_freehanddrawing', $data);
         }
     }
 }
