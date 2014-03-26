@@ -46,11 +46,11 @@ YUI.add('moodle-qtype_freehanddrawing-form', function(Y) {
 			drawing_radius_change_sub: null,
 			edit_mode: false,
 				
-			init: function(questionID, drawingRadius, correctAnswer) {
-				if (typeof correctAnswer != 'undefined') {
+			init: function(questionID, drawingRadius, correctAnswer, canvasInstanceID) {
+				if (typeof correctAnswer != 'undefined' && correctAnswer != 'undefined') {
 					// A correct answer is provided by the argument list--so this means the canvas is to be treated as READ ONLY
 					this.drawingRadius[questionID] = drawingRadius;
-					this.draw_correct_answer(questionID, correctAnswer);
+					this.draw_correct_answer(questionID, correctAnswer, canvasInstanceID);
 				} else {
 					// No correct answer provided in argument list (although one might pre-exist in the textarea)
 					// This means we allow drawing by the user.
@@ -145,9 +145,9 @@ YUI.add('moodle-qtype_freehanddrawing-form', function(Y) {
         }
 	},
 
-	draw_correct_answer: function(questionID, correctAnswer) {
+	draw_correct_answer: function(questionID, correctAnswer, canvasInstanceID) {
 		Y.all(SELECTORS.READONLYCANVAS).each(function(node) {
-			if (node.ancestor().getAttribute('class') == 'qtype_freehanddrawing_id_' + questionID) {
+			if (node.ancestor().getAttribute('class') == 'qtype_freehanddrawing_id_' + questionID && node.ancestor().getData('canvas-instance-id') == canvasInstanceID) {
 				canvasNode = node;
 			}
 		}.bind(this));
@@ -157,11 +157,11 @@ YUI.add('moodle-qtype_freehanddrawing-form', function(Y) {
 		canvasNode.setStyles({ cursor: 'auto', });
 		
 	
-		this.canvasContext[questionID] = canvasNode.getDOMNode().getContext('2d');
+		this.canvasContext[canvasInstanceID] = canvasNode.getDOMNode().getContext('2d');
 		
 			var img = new Image();
 			img.onload = function() {
-				this.canvasContext[questionID].drawImage(img, 0, 0);
+				this.canvasContext[canvasInstanceID].drawImage(img, 0, 0);
 			}.bind(this);
 			img.src = correctAnswer;
 		
