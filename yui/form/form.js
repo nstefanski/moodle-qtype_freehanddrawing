@@ -92,9 +92,9 @@ YUI.add('moodle-qtype_freehanddrawing-form', function(Y) {
 					if(!this.canvas_mouseup_sub) { 
 						this.canvas_mouseup_sub =  Y.delegate('mouseup',   this.canvas_mouseup,    Y.config.doc, SELECTORS.GENERICCANVAS, this); 
 					}
-				if(!this.canvas_mouseout_sub) { 
-					this.canvas_mouseout_sub =  Y.delegate('mouseout',   this.canvas_mouseout,    Y.config.doc, SELECTORS.GENERICCANVAS, this); 
-				}
+    				if(!this.canvas_mouseout_sub) { 
+	    				this.canvas_mouseout_sub =  Y.delegate('mouseout',   this.canvas_mouseout,    Y.config.doc, SELECTORS.GENERICCANVAS, this); 
+		    		}
 					if(!this.drawing_radius_change_sub) { 
 						this.drawing_radius_change_sub =  Y.delegate('change', this.drawing_radius_change, Y.config.doc, SELECTORS.DRAWINGRADIUS, this); 
 					}
