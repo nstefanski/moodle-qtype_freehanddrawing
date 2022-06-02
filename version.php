@@ -29,7 +29,7 @@ $plugin->component = 'qtype_freehanddrawing';
 
 $plugin->requires  = 2013040500;
 
-$plugin->release = 1;
+$plugin->release = 1.1;
 
 $plugin->maturity  = MATURITY_STABLE;
-$plugin->version = 2014061619;
+$plugin->version = 2022060200;
