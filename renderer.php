@@ -314,6 +314,9 @@ class qtype_freehanddrawing_renderer extends qtype_renderer {
 			
 		}
 
+		// Set input that is inspected by the mobile app for settings
+		$canvas .= "<input class=\"qtype_freehanddrawing_initial_radius\" value=\"$question->radius\"></input>";
+		
 		$canvas .= "<canvas class=\"qtype_freehanddrawing_canvas".$readonlyCanvas."\" width=\"".$bgimageArray[1]."\" height=\"".$bgimageArray[2]."\"style=\"background:url('$bgimageArray[0]')\"></canvas></div>";
 		
 		
