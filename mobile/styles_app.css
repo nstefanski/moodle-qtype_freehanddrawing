@@ -1,0 +1,14 @@
+.qtype-freehanddrawing .qtype_freehanddrawing_eraser,
+.qtype-freehanddrawing .qtype_freehanddrawing_eraser_tool,
+.qtype-freehanddrawing .qtype_freehanddrawing_textarea,
+.qtype-freehanddrawing .qtype_freehanddrawing_initial_radius {
+     display: none;
+}
+.qtype-freehanddrawing canvas.qtype_freehanddrawing_canvas {
+     border: 1px solid #000;
+     -moz-user-select: none;
+     -khtml-user-select: none;
+     -webkit-user-select: none;
+     user-select: none;
+     touch-action: none;
+}
