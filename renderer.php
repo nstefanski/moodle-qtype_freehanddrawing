@@ -299,8 +299,10 @@ class qtype_freehanddrawing_renderer extends qtype_renderer {
 			list($blendedImgDataURL, $matchPercentage) = self::compare_drawings($correctAnswer, $currentAnswer, true);
 			if ($options->correctness === 0) {
 				$this->page->requires->yui_module('moodle-qtype_freehanddrawing-form', 'Y.Moodle.qtype_freehanddrawing.form.init', array($question->id, $question->radius, $currentAnswer, $canvasInstanceID));
+				$canvas .= "<input class=\"qtype_freehanddrawing_answerdisplay\" value=\"$currentAnswer\"></textarea>";
 			} else {
 				$this->page->requires->yui_module('moodle-qtype_freehanddrawing-form', 'Y.Moodle.qtype_freehanddrawing.form.init', array($question->id, $question->radius, $blendedImgDataURL, $canvasInstanceID));
+				$canvas .= "<input class=\"qtype_freehanddrawing_answerdisplay\" value=\"$blendedImgDataURL\"></textarea>";
 			}
 			$fraction = ($matchPercentage /  ($question->threshold));
 			$feedbackimg = $this->feedback_image($fraction);
