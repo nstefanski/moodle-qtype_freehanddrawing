@@ -1,7 +1,8 @@
 .qtype-freehanddrawing .qtype_freehanddrawing_eraser,
 .qtype-freehanddrawing .qtype_freehanddrawing_eraser_tool,
 .qtype-freehanddrawing .qtype_freehanddrawing_textarea,
-.qtype-freehanddrawing .qtype_freehanddrawing_initial_radius {
+.qtype-freehanddrawing .qtype_freehanddrawing_initial_radius,
+.qtype-freehanddrawing .qtype_freehanddrawing_answerdisplay {
      display: none;
 }
 .qtype-freehanddrawing canvas.qtype_freehanddrawing_canvas {
