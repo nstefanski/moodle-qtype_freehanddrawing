@@ -7,6 +7,7 @@
 #fitem_id_qtype_freehanddrawing_textarea {
     display: block;
 }
+.qtype_freehanddrawing_answerdisplay,
 .qtype_freehanddrawing_initial_radius,
 .qtype_freehanddrawing_textarea {
 	display: none;
