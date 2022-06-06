@@ -70,6 +70,13 @@ var result = {
             cx.lineTo(xy.x,xy.y);
             cx.stroke();
         }
+        function drawAnswer(cx, imgSrc) {
+            var img = new Image();
+            img.onload = function(){
+                cx.drawImage(img,0,0);
+            };
+            img.src = imgSrc;
+        }
 
         if (!this.question) {
             console.warn('Aborting because of no question received.');
@@ -77,7 +84,7 @@ var result = {
         }
         const div = document.createElement('div');
         div.innerHTML = this.question.html;
-         // Get question questiontext.
+        // Get question questiontext.
         const questiontext = div.querySelector('.qtext');
 
         // Replace Moodle's correct/incorrect and feedback classes with our own.
@@ -85,11 +92,11 @@ var result = {
         this.CoreQuestionHelperProvider.replaceCorrectnessClasses(div);
         this.CoreQuestionHelperProvider.replaceFeedbackClasses(div);
 
-         // Treat the correct/incorrect icons.
+        // Treat the correct/incorrect icons.
         this.CoreQuestionHelperProvider.treatCorrectnessIcons(div);
 
  
-        if (div.querySelector('.readonly') !== null) {
+        if (div.querySelector('.readonly-canvas') !== null) {
             this.question.readonly = true;
         }
         if (div.querySelector('.feedback') !== null) {
@@ -97,7 +104,7 @@ var result = {
             this.question.feedbackHTML = true;
         }
         
-         this.question.text = this.CoreDomUtilsProvider.getContentsOfElement(div, '.qtext');
+        this.question.text = this.CoreDomUtilsProvider.getContentsOfElement(div, '.qtext');
 
         if (typeof this.question.text == 'undefined') {
             this.logger.warn('Aborting because of an error parsing question.', this.question.name);
@@ -108,89 +115,88 @@ var result = {
         // (afterRender)="questionRendered()
         this.questionRendered = function questionRendered() {
             //do stuff that needs the question rendered before it can run.
-            
-            var textarea = this.componentContainer.querySelector('.qtype_freehanddrawing_textarea');
-            var eraser = this.componentContainer.querySelector('.qtype-freehanddrawing-eraser-mobile');
-            var eraserTool = this.componentContainer.querySelector('.qtype-freehanddrawing-erasertool-mobile');
-            var drawTool = this.componentContainer.querySelector('.qtype-freehanddrawing-drawtool-mobile');
             var canvas = this.componentContainer.querySelector('.qtype_freehanddrawing_canvas');
             var canvasContext = [];
             var questionID = canvas_get_question_id(canvas);
-            var lw = 20; // Default just in case
-            if (this.question.radius) {
-                lw = this.question.radius;
-            }
-            
-            // copied from create_canvas_context
             canvasContext[questionID] = canvas.getContext('2d');
-            canvasContext[questionID].lineJoin = 'round';
-            canvasContext[questionID].lineCap = 'round';
-            canvasContext[questionID].strokeStyle = 'blue';
-            canvasContext[questionID].fillStyle = 'blue';
-            canvasContext[questionID].lineWidth = lw;
-            canvasContext[questionID].globalCompositeOperation = 'source-over';
-            
-            var drawing = false;
-            
-            // blankCanvas to check if the canvas is empty at start
-            var blankCanvas = document.createElement('canvas');
-            blankCanvas.width = canvas.width;
-            blankCanvas.height = canvas.height;
-            if(textarea && textarea.value !== blankCanvas.toDataURL()){
-                var img = new Image();
-                img.onload = function(){
-                    canvasContext[questionID].drawImage(img,0,0);
-                };
-                img.src = textarea.value;
-            } else if(this.question.status == 'Correct' || this.question.status == 'Correct') {
-                // todo - add answer data to be read by mobile app
-            }
-            
-            eraser.addEventListener('click', function(e) {
-                if( confirm(eraser.alt) == true ) {
-                    canvasContext[questionID].clearRect(0, 0, canvas.width, canvas.height);
+
+            if (this.question.readonly) {
+                var correct = this.componentContainer.querySelector('.qtype_freehanddrawing_answerdisplay');
+                drawAnswer(canvasContext[questionID], correct.value);
+            } else {
+                var textarea = this.componentContainer.querySelector('.qtype_freehanddrawing_textarea');
+                var eraser = this.componentContainer.querySelector('.qtype-freehanddrawing-eraser-mobile');
+                var eraserTool = this.componentContainer.querySelector('.qtype-freehanddrawing-erasertool-mobile');
+                var drawTool = this.componentContainer.querySelector('.qtype-freehanddrawing-drawtool-mobile');
+                var lw = 20; // Default just in case
+                if (this.question.radius) {
+                    lw = this.question.radius;
                 }
-            });
-            eraserTool.addEventListener('click', function(e) {
-                canvasContext[questionID].globalCompositeOperation = 'destination-out';
-                drawTool.style.display = 'block';
-                eraserTool.style.display = 'none';
-            });
-            drawTool.addEventListener('click', function(e) {
+
+                // copied from create_canvas_context
+                canvasContext[questionID].lineJoin = 'round';
+                canvasContext[questionID].lineCap = 'round';
+                canvasContext[questionID].strokeStyle = 'blue';
+                canvasContext[questionID].fillStyle = 'blue';
+                canvasContext[questionID].lineWidth = lw;
                 canvasContext[questionID].globalCompositeOperation = 'source-over';
-                eraserTool.style.display = 'block';
-                drawTool.style.display = 'none';
-            });
-            canvas.addEventListener('mousedown', function(e) {
-                drawStart(e, canvasContext[questionID]);
-                drawing = true;
-            });
-            canvas.addEventListener('mousemove', function(e) {
-                if(drawing){
-                    drawMove(e, canvasContext[questionID]);
+
+                var drawing = false;
+
+                // blankCanvas to check if the canvas is empty at start
+                var blankCanvas = document.createElement('canvas');
+                blankCanvas.width = canvas.width;
+                blankCanvas.height = canvas.height;
+                if(textarea && textarea.value !== blankCanvas.toDataURL()){
+                    drawAnswer(canvasContext[questionID], textarea.value);
                 }
-            });
-            canvas.addEventListener('mouseup', function(e) {
-                drawing = false;
-                textarea.value = e.currentTarget.toDataURL();
-            });
-            canvas.addEventListener('mouseout', function(e) {
-                drawing = false;
-                textarea.value = e.currentTarget.toDataURL();
-            });
-            canvas.addEventListener('touchstart', function(e) {
-                drawStart(e, canvasContext[questionID]);
-                drawing = true;
-            });
-            canvas.addEventListener('touchmove', function(e) {
-                if(drawing){
-                    drawMove(e, canvasContext[questionID]);
-                }
-            });
-            canvas.addEventListener('touchend', function(e) {
-                drawing = false;
-                textarea.value = e.currentTarget.toDataURL();
-            });
+
+                eraser.addEventListener('click', function(e) {
+                    if( confirm(eraser.alt) == true ) {
+                        canvasContext[questionID].clearRect(0, 0, canvas.width, canvas.height);
+                    }
+                });
+                eraserTool.addEventListener('click', function(e) {
+                    canvasContext[questionID].globalCompositeOperation = 'destination-out';
+                    drawTool.style.display = 'block';
+                    eraserTool.style.display = 'none';
+                });
+                drawTool.addEventListener('click', function(e) {
+                    canvasContext[questionID].globalCompositeOperation = 'source-over';
+                    eraserTool.style.display = 'block';
+                    drawTool.style.display = 'none';
+                });
+                canvas.addEventListener('mousedown', function(e) {
+                    drawStart(e, canvasContext[questionID]);
+                    drawing = true;
+                });
+                canvas.addEventListener('mousemove', function(e) {
+                    if(drawing){
+                        drawMove(e, canvasContext[questionID]);
+                    }
+                });
+                canvas.addEventListener('mouseup', function(e) {
+                    drawing = false;
+                    textarea.value = e.currentTarget.toDataURL();
+                });
+                canvas.addEventListener('mouseout', function(e) {
+                    drawing = false;
+                    textarea.value = e.currentTarget.toDataURL();
+                });
+                canvas.addEventListener('touchstart', function(e) {
+                    drawStart(e, canvasContext[questionID]);
+                    drawing = true;
+                });
+                canvas.addEventListener('touchmove', function(e) {
+                    if(drawing){
+                        drawMove(e, canvasContext[questionID]);
+                    }
+                });
+                canvas.addEventListener('touchend', function(e) {
+                    drawing = false;
+                    textarea.value = e.currentTarget.toDataURL();
+                });
+            }
         }
 
         // Wait for the DOM to be rendered.
